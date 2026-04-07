@@ -3,6 +3,10 @@ import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import User from "../models/user.model.js";
 
+
+
+
+
 export const signUp = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
     

@@ -1,5 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { JWT_ACCESS_SECRET, JWT_ACCESS_EXPIRY, JWT_REFRESH_EXPIRY, JWT_REFRESH_SECRET } from "../config/index.js";
 
 const warehouseAddressSchema = new mongoose.Schema(
   {
@@ -63,7 +65,7 @@ const userSchema = new Schema(
       warehouseAddress: {
         type: warehouseAddressSchema,
         default: null,
-      }
+      },
     },
     avatar: {
       type: String,
@@ -88,6 +90,38 @@ const userSchema = new Schema(
   },
 );
 
+userSchema.pre("save", async function () {
+  if (!this.isModified("passwordHash")) return;
+  this.passwordHash = await bcrypt.hash(this.passwordHash, 10);
+});
+
+userSchema.methods.comparePassword = async function (password) {
+  return await bcrypt.compare(password, this.passwordHash);
+};
+
+userSchema.methods.generateAccessToken =  function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+      role:this.role
+    },
+    JWT_ACCESS_SECRET,
+    {
+      expiresIn: JWT_ACCESS_EXPIRY,
+    },
+  );
+};
+userSchema.methods.generateRefreshToken =  function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+    },
+    JWT_REFRESH_SECRET,
+    {
+      expiresIn: JWT_REFRESH_EXPIRY,
+    },
+  );
+};
 
 
 

@@ -1,10 +1,14 @@
 import { Router } from "express";
-import { signIn, signUp } from "../controllers/auth.controller.js";
+import { loginUser, logoutUser, refreshAccessToken, registerUser } from "../controllers/auth.controller.js";
+import verifyJWT from "../middlewares/auth.middleware.js";
 const authRouter = Router();
 
 
-authRouter.post("/register", signUp)
-authRouter.post("/login", signIn)
+authRouter.post("/register", registerUser);
+authRouter.post("/login", loginUser)
+authRouter.post("/logout",verifyJWT, logoutUser)
+authRouter.post("/refresh-token", refreshAccessToken)
+
 
 
 export default authRouter;

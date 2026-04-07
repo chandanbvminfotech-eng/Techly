@@ -1,0 +1,26 @@
+import jwt from "jsonwebtoken";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { JWT_ACCESS_SECRET } from "../config/index.js";
+import User from "../models/user.model.js";
+import { ApiError } from "../utils/apiError.js";
+
+const verifyJWT = asyncHandler(async (req, res,next) => {
+    try {
+        const token = req.cookies?.accessToken || req.headers("Authorization").replace("Bearer ","")
+    
+        const decodedToken = jwt.verify(token,JWT_ACCESS_SECRET)
+    
+        const user = await User.findById(decodedToken?._id).select("-passwordHash -refreshToken")
+    
+        if (!user) {
+            throw new ApiError(401,"Invalid Access Token")
+        }
+    
+        req.user = user
+        next()
+    } catch (error) {
+        throw new ApiError(400,error?.message,"Invalid access token")
+    }
+})
+
+export default verifyJWT
