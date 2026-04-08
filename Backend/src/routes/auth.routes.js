@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { loginUser, logoutUser, refreshAccessToken, registerUser } from "../controllers/auth.controller.js";
 import verifyJWT from "../middlewares/auth.middleware.js";
+import requireRole from "../middlewares/requireRole.middleware.js"
 const authRouter = Router();
 
 

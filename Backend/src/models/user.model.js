@@ -34,7 +34,7 @@ const userSchema = new Schema(
       trim: true,
       minLength: [10, "Phone number must be at least 10 characters long"],
     },
-    passwordHash: {
+    password: {
       type: String,
       required: true,
       minLength: [6, "Password must be at least 6 characters long"],
@@ -91,12 +91,12 @@ const userSchema = new Schema(
 );
 
 userSchema.pre("save", async function () {
-  if (!this.isModified("passwordHash")) return;
-  this.passwordHash = await bcrypt.hash(this.passwordHash, 10);
+  if (!this.isModified("password")) return;
+  this.password = await bcrypt.hash(this.password, 10);
 });
 
 userSchema.methods.comparePassword = async function (password) {
-  return await bcrypt.compare(password, this.passwordHash);
+  return await bcrypt.compare(password, this.password);
 };
 
 userSchema.methods.generateAccessToken =  function () {

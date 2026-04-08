@@ -3,7 +3,7 @@ import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import User from "../models/user.model.js";
 import { JWT_REFRESH_SECRET } from "../config/index.js";
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
 const generateAccessRefreshToken = async (userId) => {
   try {
     const user = await User.findById(userId);
@@ -29,10 +29,10 @@ export const registerUser = asyncHandler(async (req, res) => {
   const existingUser = await User.findOne({ email });
 
   if (existingUser) {
-    throw new ApiError("User already exists", 400);
+    throw new ApiError(500, "User already exists");
   }
 
-  const user = await User.create({ name, email, passwordHash: password });
+  const user = await User.create({ name, email, password });
 
   if (!user) {
     throw new ApiError("Failed to create user", 500);
@@ -44,17 +44,15 @@ export const registerUser = asyncHandler(async (req, res) => {
 });
 
 export const loginUser = asyncHandler(async (req, res) => {
-  const { email, passwordHash } = req.body;
+  const { email, password } = req.body;
 
   const user = await User.findOne({ email });
   if (!user) {
     throw new ApiError(404, "User not found");
   }
-
-  const isPasswordValid = await user.comparePassword(passwordHash);
-
+  const isPasswordValid = await user.comparePassword(password);
   if (!isPasswordValid) {
-    throw new ApiError("Invalid credentials", 401);
+    throw new ApiError(401, "Invalid credentials");
   }
 
   const { accessToken, refreshToken } = await generateAccessRefreshToken(
@@ -62,7 +60,7 @@ export const loginUser = asyncHandler(async (req, res) => {
   );
 
   const loggedInUser = await User.findById(user._id).select(
-    "-passwordHash -refreshToken",
+    "-password -refreshToken",
   );
 
   const options = {
@@ -82,17 +80,20 @@ export const loginUser = asyncHandler(async (req, res) => {
           refreshToken,
         },
         "User signed in successfully",
-        400,
       ),
     );
 });
 
 export const logoutUser = asyncHandler(async (req, res) => {
-  const user = await User.findByIdAndUpdate(
+  console.log(req.cookies)
+  if (!req.user?._id) {
+    throw new ApiError(401, "Unauthorized");
+  }
+  await User.findByIdAndUpdate(
     req.user._id,
     {
-      $set: {
-        refreshToken: null,
+      $unset: {
+        refreshToken: 1,
       },
     },
     {
@@ -106,18 +107,17 @@ export const logoutUser = asyncHandler(async (req, res) => {
   };
   return res
     .status(200)
-    .clearCookie("accessToken")
-    .clearCookie("refreshToken")
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
     .json(new ApiResponse(200, {}, "User logout successfully"));
 });
 
 export const refreshAccessToken = asyncHandler(async (req, res) => {
-  const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
-
+  const incomingRefreshToken =
+    req.cookies.refreshToken || req.body.refreshToken;
   if (!incomingRefreshToken) {
     throw new ApiError(400, "unauthorized");
   }
-
   try {
     const decodedToken = jwt.verify(incomingRefreshToken, JWT_REFRESH_SECRET);
 
@@ -136,17 +136,19 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
       secure: process.env.NODE_ENV === "production",
     };
 
-    const { accessToken, newRefreshToken } =
-      await generateAccessRefreshToken(user._id);
+    const { accessToken, refreshToken } = await generateAccessRefreshToken(
+      user._id,
+    );
 
+    console.log(refreshToken);
     return res
       .status(200)
       .cookie("accessToken", accessToken, options)
-      .cookie("refreshToken", newRefreshToken, options)
+      .cookie("refreshToken", refreshToken, options)
       .json(
         new ApiResponse(
           200,
-          { accessToken, refreshToken: newRefreshToken },
+          { accessToken, refreshToken },
           "Access token refreshed",
         ),
       );

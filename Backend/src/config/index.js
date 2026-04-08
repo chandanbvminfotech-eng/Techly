@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import path from "path";
+import { ApiError } from "../utils/apiError.js";
 
 const env = process.env.NODE_ENV || "development";
 const envPath = path.resolve(process.cwd(),`.env.${env}.local`);
@@ -7,6 +8,13 @@ const envPath = path.resolve(process.cwd(),`.env.${env}.local`);
 
 dotenv.config({ path: envPath });
 
+
+if (!process.env.MONGO_URI) {
+  throw new ApiError(400,"provide a mongodb url for db connection")
+}
+if (!process.env.JWT_ACCESS_SECRET || !process.env.JWT_REFRESH_SECRET) {
+  throw new ApiError(400,"Jwt token can't be empty please provide a token")
+}
 
 export const {
   PORT,
