@@ -5,9 +5,7 @@ import { ApiError } from "../utils/apiError.js";
 const env = process.env.NODE_ENV || "development";
 const envPath = path.resolve(process.cwd(),`.env.${env}.local`);
 
-
 dotenv.config({ path: envPath });
-
 
 if (!process.env.MONGO_URI) {
   throw new ApiError(400,"provide a mongodb url for db connection")

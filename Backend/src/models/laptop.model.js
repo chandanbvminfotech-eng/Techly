@@ -32,7 +32,7 @@ const laptopSchema = new Schema({
     type: String,
     trim: true,
     lowercase: true,
-    enum: ["Windows", "macOS", "Linux", "No OS"],
+    enum: ["windows", "macos", "linux", "dos"],
   },
   displaySize: {
     type: Number,
@@ -56,7 +56,6 @@ const laptopSchema = new Schema({
 
 laptopSchema.index({ ram: 1 });
 laptopSchema.index({ storage: 1 });
-laptopSchema.index({ os: 1 });
 laptopSchema.index({ storageType: 1 });
 
 const Laptop = Product.discriminator("laptop", laptopSchema);

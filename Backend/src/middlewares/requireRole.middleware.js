@@ -1,6 +1,5 @@
 import { ApiError } from "../utils/apiError.js";
 
-
 const requireRole = (...allowedroles) => {
   return (req, res, next) => {
     try {
@@ -12,9 +11,9 @@ const requireRole = (...allowedroles) => {
       }
       next();
     } catch (error) {
-      next(error)
+      next(error);
     }
   };
 };
 
-export default requireRole
+export default requireRole;
