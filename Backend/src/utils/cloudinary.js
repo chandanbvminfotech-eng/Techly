@@ -1,14 +1,17 @@
-import fs from "fs"
+import fs from "fs";
 import { v2 as cloudinary } from "cloudinary";
-import { CLOUDINARY_CLOUD_NAME,CLOUDINARY_API_SECRET,CLOUDINARY_API_KEY } from "../config/index.js";
-
+import {
+  CLOUDINARY_CLOUD_NAME,
+  CLOUDINARY_API_SECRET,
+  CLOUDINARY_API_KEY,
+} from "../config/index.js";
+import { ApiError } from "./apiError.js";
 
 cloudinary.config({
   cloud_name: CLOUDINARY_CLOUD_NAME,
-  api_key:CLOUDINARY_API_KEY,
+  api_key: CLOUDINARY_API_KEY,
   api_secret: CLOUDINARY_API_SECRET,
 });
-
 
 const uploadOnCloudinary = async (localFilePath) => {
   try {
@@ -21,37 +24,36 @@ const uploadOnCloudinary = async (localFilePath) => {
         folder: "products",
       })
       .catch((error) => console.error(error));
-    fs.unlinkSync(localFilePath)                                                  //delete from file from local
+    fs.unlinkSync(localFilePath); //delete from file from local
     return response;
   } catch (err) {
     if (fs.existsSync(localFilePath)) {
-      fs.unlinkSync(localFilePath);                                                //delete from file from local
+      fs.unlinkSync(localFilePath); //delete from file from local
     }
-    console.error("Error in uploading image", err);
+    return new ApiError(401, "Image not uploaded");
   }
 };
 
-const deleteFromCloudinary = async (databaseFilePath) => {
+const deleteFromCloudinary = async (publicId) => {
   try {
-    if (!databaseFilePath) {
+    if (!publicId) {
       throw new ApiError(400, "Please provide a file path to delete");
     }
-    const spreadedUrl = databaseFilePath.split("/");
-    const getPublicId = spreadedUrl[spreadedUrl.length - 1];
-    const publicId = getPublicId.split(".")[0];
 
     const response = await cloudinary.uploader.destroy(publicId);
 
     console.log("Deleted from cloudinary");
 
-    if (fs.existsSync(databaseFilePath)) {
-      fs.unlinkSync(databaseFilePath);
-    }
     return response;
   } catch (err) {
-    console.error("Cloudinary upload error:", err);
-    return null;
+    return new ApiError(401, "Image not deleted");
   }
 };
 
-export {uploadOnCloudinary,deleteFromCloudinary}
+export { uploadOnCloudinary, deleteFromCloudinary };
+
+// To search a image in cloudinary via public_id
+// const result = await cloudinary.search
+//   .expression("juhylzumwfjbxxigzvxg")
+//   .execute()
+//   .catch((error) => console.error(error));

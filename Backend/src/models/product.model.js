@@ -5,7 +5,18 @@ const productSchema = new mongoose.Schema(
     name: { type: String, required: true, trim: true },
     description: { type: String, required: true, trim: true },
     brand: { type: String, required: true, trim: true },
-    images: [{ type: String }],
+    images: [
+      {
+        url: {
+          type: String,
+          required:true
+        },
+        public_id: {
+          type: String,
+          require:true
+        }
+      },
+    ],
     sellerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -19,13 +30,13 @@ const productSchema = new mongoose.Schema(
     price: {
       type: Number,
       required: true,
-      min:0
+      min: 0,
     },
     stock: {
       type: Number,
       required: true,
-      min:0
-    }
+      min: 0,
+    },
   },
   {
     timestamps: true,
