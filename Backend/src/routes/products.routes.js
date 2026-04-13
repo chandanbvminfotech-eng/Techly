@@ -2,10 +2,9 @@ import { Router } from "express";
 import {
   addProduct,
   viewProducts,
-  viewProduct,
+  viewSingleProduct,
   deleteProductController,
   updateProductController,
-
 } from "../controllers/product.controller.js";
 import verifyJWT from "../middlewares/auth.middleware.js";
 import requireRole from "../middlewares/requireRole.middleware.js";
@@ -22,10 +21,10 @@ productRouter.post(
 );
 
 productRouter.get("/", viewProducts);
-productRouter.get("/:id", viewProduct);
-
-productRouter.put("/:id", verifyJWT,requireRole("seller"),updateProductController);
-
+productRouter.get("/:id", viewSingleProduct);
+productRouter.put("/:id", verifyJWT,requireRole("seller"),upload.array("images",5),updateProductController);
 productRouter.delete("/:id", verifyJWT, deleteProductController);
+
+
 
 export default productRouter;

@@ -21,13 +21,13 @@ const viewProducts = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, result, "Products fetched"));
 });
 
-const viewProduct = asyncHandler(async (req, res) => {
+const viewSingleProduct = asyncHandler(async (req, res) => {
   const result = await getProductById({
     productId: req.params.id,
     user: req.user,
   });
   return res.status(200).json(new ApiResponse(200, result, "Product fetched"));
-})
+});
 
 const deleteProductController = asyncHandler(async (req, res) => {
   await deleteProduct({
@@ -44,8 +44,17 @@ const updateProductController = asyncHandler(async (req, res) => {
     userId:req.user._id,
     role: req.user.role,
     body: req.body,
+    files:req.files
   })
   return res.status(200).json(new ApiResponse(200, result, "Product updated"));
 })
 
-export { addProduct, viewProducts, deleteProductController , viewProduct , updateProductController};
+
+
+export {
+  addProduct,
+  viewProducts,
+  deleteProductController,
+  viewSingleProduct,
+  updateProductController,
+};

@@ -221,18 +221,14 @@ const deleteProduct = async ({ productId, userId, role }) => {
   return { message: "Product deleted successfully" };
 };
 
-const updateProduct = async ({ productId, userId, role, body }) => {
-
+const updateProduct = async ({ productId, userId, role, body, files }) => {
   if (!mongoose.Types.ObjectId.isValid(productId)) {
     throw new ApiError(400, "Invalid product ID");
   }
-
   const product = await Product.findById(productId);
-
   if (!product) {
     throw new ApiError(404, "Product not found");
   }
-
 
   const isOwner = product.sellerId.toString() === userId.toString();
   const isAdmin = role === "admin";
@@ -240,7 +236,6 @@ const updateProduct = async ({ productId, userId, role, body }) => {
   if (!isOwner && !isAdmin) {
     throw new ApiError(403, "Not allowed to update this product");
   }
-
 
   const allowedFields = [
     "name",
@@ -261,36 +256,68 @@ const updateProduct = async ({ productId, userId, role, body }) => {
   ];
 
   const updateData = {};
-
   for (const key of Object.keys(body)) {
     if (allowedFields.includes(key)) {
       updateData[key] = body[key];
     }
   }
 
-  let updatedProduct;
+  let finalImages = product.images.map((img) => img.toObject());
 
+  if (body.keepImages !== undefined) {
+    const imagesToKeep = Array.isArray(body.keepImages)
+      ? body.keepImages
+      : [body.keepImages];
 
-  if (product.category === "laptop") {
-    updatedProduct = await Laptop.findByIdAndUpdate(productId, updateData, {
-      new: true,
-      runValidators: true,
-    });
-  } else if (product.category === "phone") {
-    updatedProduct = await Phone.findByIdAndUpdate(productId, updateData, {
-      new: true,
-      runValidators: true,
-    });
-  } else {
-    updatedProduct = await Product.findByIdAndUpdate(productId, updateData, {
-      new: true,
-      runValidators: true,
-    });
+    const existingImages = product.images.map((img) => img.toObject());
+
+    const imagesToDelete = existingImages.filter(
+      (img) => !imagesToKeep.includes(img.public_id),
+    );
+
+    const imagesToBeKept = existingImages
+      .filter((img) => imagesToKeep.includes(img.public_id))
+      .map(({ _id, ...rest }) => rest);
+
+    if (imagesToDelete.length > 0) {
+      const deletePromises = imagesToDelete.map((img) =>
+        deleteFromCloudinary(img.public_id),
+      );
+
+      await Promise.allSettled(deletePromises); // safe
+    }
+
+    finalImages = imagesToBeKept;
   }
+
+  if (files && files.length > 0) {
+    const uploadPromises = files.map((file) => uploadOnCloudinary(file.path));
+
+    const results = await Promise.all(uploadPromises);
+
+    const newUploadedImages = results
+      .filter((r) => r !== null)
+      .map((r) => ({
+        url: r.secure_url,
+        public_id: r.public_id,
+      }));
+
+    finalImages = [...finalImages, ...newUploadedImages];
+  }
+
+  updateData.images = finalImages;
+
+  let Model = Product;
+  if (product.category === "laptop") Model = Laptop;
+  if (product.category === "phone") Model = Phone;
+
+  const updatedProduct = await Model.findByIdAndUpdate(productId, updateData, {
+    new: true,
+    runValidators: true,
+  });
 
   return updatedProduct;
 };
-
 export {
   createProduct,
   getProducts,
