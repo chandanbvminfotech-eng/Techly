@@ -14,39 +14,41 @@ cloudinary.config({
 });
 
 const uploadOnCloudinary = async (localFilePath) => {
+  if (!localFilePath) {
+    throw new ApiError(400, "No file path provided");
+  }
   try {
-    if (!localFilePath) {
-      return res.status(400).json({ msg: "Please provide a file to upload" });
-    }
-    const response = await cloudinary.uploader //upload images in products folder
-      .upload(localFilePath, {
-        resource_type: "auto",
-        folder: "products",
-      })
-      .catch((error) => console.error(error));
-    fs.unlinkSync(localFilePath); //delete from file from local
+    const response = await cloudinary.uploader.upload(localFilePath, {
+      resource_type: "auto",
+      folder: "products",
+    });
+
     return response;
-  } catch (err) {
+  } catch (error) {
+    throw new ApiError(500, "Cloudinary upload failed");
+  } finally {
+    
     if (fs.existsSync(localFilePath)) {
-      fs.unlinkSync(localFilePath); //delete from file from local
+      fs.unlinkSync(localFilePath);
     }
-    return new ApiError(401, "Image not uploaded");
   }
 };
 
 const deleteFromCloudinary = async (publicId) => {
-  try {
-    if (!publicId) {
-      throw new ApiError(400, "Please provide a file path to delete");
-    }
+  if (!publicId) {
+    throw new ApiError(400, "Public ID is required");
+  }
 
+  try {
     const response = await cloudinary.uploader.destroy(publicId);
 
-    console.log("Deleted from cloudinary");
+    if (response.result !== "ok" && response.result !== "not found") {
+      throw new ApiError(500, "Failed to delete image from Cloudinary");
+    }
 
     return response;
-  } catch (err) {
-    return new ApiError(401, "Image not deleted");
+  } catch (error) {
+    throw new ApiError(500, "Cloudinary deletion failed");
   }
 };
 

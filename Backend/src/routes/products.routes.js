@@ -22,7 +22,7 @@ productRouter.post(
 
 productRouter.get("/", viewProducts);
 productRouter.get("/:id", viewSingleProduct);
-productRouter.put("/:id", verifyJWT,requireRole("seller"),upload.array("images",5),updateProductController);
+productRouter.put("/:id", verifyJWT,requireRole("seller","admin"),upload.array("images",5),updateProductController);
 productRouter.delete("/:id", verifyJWT, deleteProductController);
 
 

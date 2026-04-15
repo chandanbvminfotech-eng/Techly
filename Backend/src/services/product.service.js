@@ -8,8 +8,8 @@ import {
 } from "../utils/cloudinary.js";
 import mongoose from "mongoose";
 
-const createProduct = async (req) => {
-  const { name, description, brand, type, price, images } = req.body;
+const createProduct = async ({ body, files, userId }) => {
+  const { name, description, brand, type, price, images } = body;
   if (!name || !price || !brand) {
     throw new ApiError(400, "Missing required fields");
   }
@@ -17,12 +17,14 @@ const createProduct = async (req) => {
     throw new ApiError(400, "Invalid product type");
   }
 
-  if (!req.files || req.files.length === 0) {
+  if (!files || files.length === 0) {
     throw new ApiError(400, "At least one image is necessary");
   }
 
-  const files = req.files;
-  const uploadmultiple = files.map((file) => uploadOnCloudinary(file.path));
+  const filesToUpload = files;
+  const uploadmultiple = filesToUpload.map((file) =>
+    uploadOnCloudinary(file.path),
+  );
   console.log("All images uploaded");
   const results = await Promise.all(uploadmultiple);
 
@@ -38,7 +40,7 @@ const createProduct = async (req) => {
     price: Number(price),
     brand,
     description,
-    sellerId: req.user._id,
+    sellerId: userId,
     images: imagesCollection,
   };
 
@@ -54,7 +56,7 @@ const createProduct = async (req) => {
         battery,
         camera,
         stock,
-      } = req.body;
+      } = body;
       product = await Phone.create({
         ...baseData,
         ram,
@@ -82,7 +84,7 @@ const createProduct = async (req) => {
         ports,
         connectivity,
         stock,
-      } = req.body;
+      } = body;
       product = await Laptop.create({
         ...baseData,
         ram,
@@ -108,7 +110,6 @@ const createProduct = async (req) => {
 
 const getProducts = async (query) => {
   let {
-    type,
     brand,
     ram,
     storage,
@@ -123,13 +124,12 @@ const getProducts = async (query) => {
     sellerId,
   } = query;
 
-  page = Number(page);
-  limit = Number(limit);
+  page = Math.max(1, Number(page) || 1);
+  limit = Math.min(20, Math.max(1, Number(limit) || 10));
   const filter = {
     isPublished: true,
   };
   if (search) filter.$text = { $search: search };
-  if (type) filter.type = type;
   if (brand) filter.brand = brand;
   if (ram) filter.ram = ram;
   if (storage) filter.storage = storage;
@@ -158,9 +158,16 @@ const getProducts = async (query) => {
   if (sort === "-price") sortOption = { price: -1 };
 
   const [products, total] = await Promise.all([
-    Product.find(filter).sort(sortOption).skip(skip).limit(limit),
+    Product.find(filter)
+      .select("-__v -createdAt -updatedAt -isPublished")
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit),
     Product.countDocuments(filter),
   ]);
+  if (!products.length) {
+    throw new ApiError(400, "Empty Product details");
+  }
 
   return {
     products,
@@ -182,9 +189,9 @@ const getProductById = async ({ productId, user }) => {
     throw new ApiError(404, "Product Not Found");
   }
   if (!product.isPublished) {
-    const isOwner = user && product.sellerId.toString() === user._id.toString();
-    const isAdmin = user?._role === "admin";
-    if (!isOwner || !isAdmin) {
+    const isOwner = user && product.sellerId.toString() === user.id.toString();
+    const isAdmin = user?.role === "admin";
+    if (!isOwner && !isAdmin) {
       throw new ApiError(403, "Product Not Available");
     }
   }
@@ -318,6 +325,7 @@ const updateProduct = async ({ productId, userId, role, body, files }) => {
 
   return updatedProduct;
 };
+
 export {
   createProduct,
   getProducts,
