@@ -38,7 +38,9 @@ const signUp = async (body) => {
     throw new ApiError("Failed to create user", 500);
   }
 
-  return user;
+  return {
+    user:user
+  };
 };
 
 const signIn = async ( body ) => {

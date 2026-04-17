@@ -124,6 +124,7 @@ const getProducts = async (query) => {
     sellerId,
   } = query;
 
+
   page = Math.max(1, Number(page) || 1);
   limit = Math.min(20, Math.max(1, Number(limit) || 10));
   const filter = {

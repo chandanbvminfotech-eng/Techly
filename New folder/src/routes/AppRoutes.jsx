@@ -5,7 +5,6 @@ import NotFound from '../features/home/pages/NotFound'
 import LoginPage from '../features/auth/pages/LoginPage';
 import RegisterPage from '../features/auth/pages/RegisterPage';
 import ProductPage from '../features/products/pages/ProductPage';
-import SingleProductPage from '../features/products/pages/SingleProductPage';
 
 
 
@@ -17,7 +16,6 @@ const AppRoutes = () => {
           <Route path="/signin" element={<LoginPage />} />
           <Route path="/signup" element={<RegisterPage />} />
           <Route path="/products" element={<ProductPage/>} />
-          <Route path="/products/:id" element={<SingleProductPage/>} />
           <Route path="*" element={<NotFound/>} />
         </Routes>
       </>
