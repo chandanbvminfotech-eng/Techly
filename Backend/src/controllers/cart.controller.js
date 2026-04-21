@@ -1,4 +1,4 @@
-import { addProductToCart, deleteDataFromCart, deleteSingleProductDataFromCart, getCartData } from "../services/cart.service.js";
+import { addProductToCart, deleteDataFromCart, deleteSingleProductDataFromCart, getCartData, updateQuantityInCart } from "../services/cart.service.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
@@ -37,5 +37,17 @@ const deleteProductFromCart = asyncHandler(async (req, res) => {
      return res.status(200).json(new ApiResponse(200, result));
 })
 
+const updateQuantity = asyncHandler(async (req, res) => {
+  const { quantity } = req.body;
+  const result = await updateQuantityInCart({
+    productId:req.params.id,
+    userId: req.user?._id,
+    quantity,
+  });
+  return res
+    .status(200)
+    .json(new ApiResponse(200, result, "Item added to cart"));
+});
 
-export {addToCart,getCart,deleteCart,deleteProductFromCart}
+
+export {addToCart,getCart,deleteCart,deleteProductFromCart,updateQuantity}
