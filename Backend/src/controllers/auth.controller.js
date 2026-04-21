@@ -6,13 +6,14 @@ import {
   signOut,
   signUp,
 } from "../services/auth.service.js";
+import User from "../models/user.model.js";
 
 // SignUp
 const registerUser = asyncHandler(async (req, res) => {
   const result = await signUp(req.body);
   return res
     .status(201)
-    .json(new ApiResponse(201, result, "User created successfully"), true);
+    .json(new ApiResponse(201, result, "User created successfully"));
 });
 
 // SignIn
@@ -76,4 +77,14 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, result, "Access token refreshed"));
 });
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken };
+const getMe = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).select(
+    "-password -refreshToken",
+  );
+  return res.status(200).json({
+    success: true,
+    data:user
+  })
+});
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken,getMe };

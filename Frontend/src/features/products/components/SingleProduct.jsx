@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-/* ─── tiny reusable spec pill ───────────────────────── */
+
 const SpecRow = ({ icon, label, value }) => (
   <div className="flex items-center gap-3 py-3 border-b border-white/5 last:border-0 group">
     <span className="text-amber-400/70 text-lg w-6 shrink-0 group-hover:text-amber-400 transition-colors duration-200">
@@ -15,7 +15,6 @@ const SpecRow = ({ icon, label, value }) => (
   </div>
 );
 
-/* ─── stock badge ───────────────────────────────────── */
 const StockBadge = ({ stock }) => {
   const low = stock <= 5;
   const out = stock === 0;
@@ -38,9 +37,7 @@ const StockBadge = ({ stock }) => {
   );
 };
 
-/* ═══════════════════════════════════════════════════════
-   MAIN COMPONENT
-══════════════════════════════════════════════════════ */
+
 const SingleProduct = ({ product }) => {
   const [activeImg, setActiveImg] = useState(0);
   const [added, setAdded] = useState(false);
@@ -55,7 +52,7 @@ const SingleProduct = ({ product }) => {
 
   return (
     <>
-      {/* Google Font */}
+
       <link
         href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
         rel="stylesheet"

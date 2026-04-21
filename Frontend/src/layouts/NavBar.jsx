@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../features/auth/authSlice";
+import { loginUser, logout, logoutUser } from "../features/auth/authSlice";
+import UserAvatar from "../components/UserAvatar";
 
 const NavBar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const location = useLocation();
+  const handleLogout = async () => {
+    await dispatch(logoutUser());
+    navigate("/");
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -59,12 +65,15 @@ const NavBar = () => {
         {/* Auth Buttons */}
         <div className="hidden md:flex gap-[10px] items-center">
           {user ? (
-            <button
-              onClick={() => dispatch(logout())}
-              className="px-[22px] py-[9px] rounded-[10px] border border-[rgba(212,175,55,0.4)] bg-transparent text-[#D4AF37] text-sm font-medium font-['DM_Sans',system-ui,sans-serif]"
-            >
-              Sign Out
-            </button>
+            <div className="flex gap-5">
+              <UserAvatar name={user.name} avatarLink={user.avatar} />
+              <button
+                onClick={handleLogout}
+                className="px-[22px] py-[9px] rounded-[10px] border border-[rgba(212,175,55,0.4)] bg-transparent text-[#D4AF37] text-sm font-medium font-['DM_Sans',system-ui,sans-serif]"
+              >
+                Sign Out
+              </button>
+            </div>
           ) : (
             <>
               <Link
@@ -148,19 +157,50 @@ const NavBar = () => {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="bg-[rgba(8,8,14,0.97)] backdrop-blur-2xl border-t border-[rgba(212,175,55,0.12)] px-6 pt-4 pb-6 flex flex-col gap-[2px] md:hidden">
-          {[
-            { to: "/", l: "Home" },
-            { to: "/signin", l: "Sign In" },
-            { to: "/signup", l: "Get Started" },
-          ].map(({ to, l }) => (
-            <Link
-              key={l}
-              to={to}
-              className="no-underline px-[14px] py-[12px] text-[#F5F0E8] text-[15px] rounded-[10px] font-['DM_Sans',system-ui,sans-serif]"
-            >
-              {l}
-            </Link>
-          ))}
+          {user ? (
+            <>
+              <div className="flex items-center gap-3 px-[14px] py-[12px]">
+                <UserAvatar name={user.name} avatarLink={user.avatar} />
+                <span className="text-[#F5F0E8] text-[15px] font-['DM_Sans',system-ui,sans-serif]">
+                  {user.name}
+                </span>
+              </div>
+              {[
+                { to: "/", l: "Home" },
+                { to: "/products", l: "Products" },
+              ].map(({ to, l }) => (
+                <Link
+                  key={l}
+                  to={to}
+                  className="no-underline px-[14px] py-[12px] text-[#F5F0E8] text-[15px] rounded-[10px] font-['DM_Sans',system-ui,sans-serif]"
+                >
+                  {l}
+                </Link>
+              ))}
+              <button
+                onClick={handleLogout}
+                className="px-[14px] py-[12px] text-left text-[#D4AF37] text-[15px] rounded-[10px] font-['DM_Sans',system-ui,sans-serif]"
+              >
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <>
+              {[
+                { to: "/", l: "Home" },
+                { to: "/signin", l: "Sign In" },
+                { to: "/signup", l: "Get Started" },
+              ].map(({ to, l }) => (
+                <Link
+                  key={l}
+                  to={to}
+                  className="no-underline px-[14px] py-[12px] text-[#F5F0E8] text-[15px] rounded-[10px] font-['DM_Sans',system-ui,sans-serif]"
+                >
+                  {l}
+                </Link>
+              ))}
+            </>
+          )}
         </div>
       )}
     </nav>

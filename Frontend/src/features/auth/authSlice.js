@@ -16,18 +16,43 @@ export const loginUser = createAsyncThunk(
 );
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
-  async (formData, ThunkAPI) => {
+  async (formData, thunkAPI) => {
     try {
       const { data } = await api.post("/auth/register", formData);
-      console.log(data.data)
       return data.data;
-    } catch (err) {
+    } catch (error) {
+      const msg = error.response?.data?.message;
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || "Registration Failed",
+        Array.isArray(msg) ? msg.join(", ") : msg || "Register Failed",
       );
     }
   },
 );
+
+export const logoutUser = createAsyncThunk(
+  "auth/logoutUser",
+  async (_, thunkAPI) => {
+    try {
+      await api.post("/auth/logout");
+      return true;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Logout Failed",
+      );
+    }
+  },
+);
+
+export const getMe = createAsyncThunk("auth/getMe", async (_, thunkAPI) => {
+  try {
+    const { data } = await api.get("/auth/me");
+    return data.data;
+  } catch (error) {
+    return thunkAPI.rejectWithValue(
+      error.response?.data?.message || "Failed to fetch data",
+    );
+  }
+});
 
 const authSlice = createSlice({
   name: "auth",
@@ -41,6 +66,9 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
     },
+    clearError: (state) => {
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -50,7 +78,7 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
+        state.user = action.payload.user;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -62,14 +90,32 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.registerSuccess=true
+        state.registerSuccess = true;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(logoutUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.loading = false;
+        state.user = null; //
+        state.error = null;
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(getMe.fulfilled, (state, action) => {
+        state.user = action.payload;
+      })
+      .addCase(getMe.rejected, (state) => {
+        state.user = null;
       });
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, clearError } = authSlice.actions;
 export default authSlice.reducer;

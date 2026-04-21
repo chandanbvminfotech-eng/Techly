@@ -46,7 +46,7 @@ const AppleIcon = () => (
 
 const RegisterPage = () => {
   const { registerSuccess } = useSelector((state) => state.auth);
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     if (registerSuccess) navigate("/signin");

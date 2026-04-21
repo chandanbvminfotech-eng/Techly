@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../authSlice.js";
+import { clearError, loginUser } from "../authSlice.js";
 
 const Input = ({
   label,
@@ -57,13 +57,16 @@ const Input = ({
 const LoginForm = () => {
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.auth);
-
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

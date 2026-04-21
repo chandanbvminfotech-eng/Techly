@@ -6,13 +6,10 @@ import { ApiError } from "../utils/apiError.js";
 
 const verifyJWT = asyncHandler(async (req, res, next) => {
   try {
-    const token =
-      req.header("Authorization")?.replace("Bearer ", "");
+    const token = req.cookies?.accessToken;                // || req.header("Authorization")?.replace("Bearer ", "");
     const decodedToken = jwt.verify(token, JWT_ACCESS_SECRET);
 
-    const user = await User.findById(decodedToken?._id).select(
-      "_id role"
-    );
+    const user = await User.findById(decodedToken?._id).select("_id role");
 
     if (!user) {
       throw new ApiError(401, "Invalid Access Token");

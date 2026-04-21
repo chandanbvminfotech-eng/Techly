@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema,model } from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { JWT_ACCESS_SECRET, JWT_ACCESS_EXPIRY, JWT_REFRESH_EXPIRY, JWT_REFRESH_SECRET } from "../config/index.js";
@@ -125,6 +125,6 @@ userSchema.methods.generateRefreshToken =  function () {
 
 
 
-const User = mongoose.model("User", userSchema);
+const User = model("User", userSchema);
 
 export default User;

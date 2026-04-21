@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 import User from "./user.model.js";
-const productSchema = new mongoose.Schema(
+const productSchema = new Schema(
   {
     name: { type: String, required: true, trim: true },
     description: { type: String, required: true, trim: true },
@@ -9,12 +9,12 @@ const productSchema = new mongoose.Schema(
       {
         url: {
           type: String,
-          required:true
+          required: true,
         },
         public_id: {
           type: String,
-          require:true
-        }
+          require: true,
+        },
       },
     ],
     sellerId: {
@@ -49,5 +49,5 @@ productSchema.index({ isPublished: 1 });
 productSchema.index({ sellerId: 1 });
 productSchema.index({ name: "text", brand: "text", description: "text" }); // full-text search
 
-const Product = mongoose.model("Product", productSchema);
+const Product = model("Product", productSchema);
 export default Product;

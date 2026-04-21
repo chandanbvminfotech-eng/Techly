@@ -20,30 +20,31 @@ const generateAccessRefreshToken = async (userId) => {
 };
 
 const signUp = async (body) => {
-  const { name, email, password } = body;
+  const { name, email, password, confirmPassword } = body;
 
-  if (!name || !email || !password) {
-    throw new ApiError(400, "All fields are required");
-  }
+  const normalizedEmail = email.toLowerCase().trim();
 
-  const existingUser = await User.findOne({ email });
-
+  const existingUser = await User.findOne({ email: normalizedEmail });
   if (existingUser) {
-    throw new ApiError(500, "User already exists");
+    throw new ApiError(409, "User already exists");
   }
 
-  const user = await User.create({ name, email, password });
+  const user = await User.create({
+    name: name.trim(),
+    email: normalizedEmail,
+    password,
+  });
 
-  if (!user) {
-    throw new ApiError("Failed to create user", 500);
-  }
+  const createdUser = await User.findById(user._id).select(
+    "-password -refreshToken",
+  );
 
   return {
-    user:user
+    user: createdUser,
   };
 };
 
-const signIn = async ( body ) => {
+const signIn = async (body) => {
   const { email, password } = body;
 
   const userDetail = await User.findOne({ email });

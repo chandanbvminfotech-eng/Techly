@@ -359,7 +359,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ═══ TRENDING PRODUCTS ══════════════════════════ */}
+      {/* ═══ TRENDING PRODUCTS ══════════════════════════ */}    
       <ProductPage/>
 
       {/* ═══ TESTIMONIAL ════════════════════════════════ */}

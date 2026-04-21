@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { registerUser } from "../authSlice.js";
+import { clearError, registerUser } from "../authSlice.js";
 
 const FormInput = ({
   label,
@@ -82,6 +82,10 @@ const RegisterForm = () => {
     confirmPassword: "",
   });
 
+  useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
+
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     setFieldErrors((prev) => ({ ...prev, [e.target.name]: "" }));
@@ -104,13 +108,7 @@ const RegisterForm = () => {
       setFieldErrors(errs);
       return;
     }
-    dispatch(
-      registerUser({
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-      }),
-    );
+    dispatch(registerUser(formData));
   };
 
   const EyeBtn = ({ show, toggle }) => (
@@ -236,9 +234,9 @@ const RegisterForm = () => {
         error={fieldErrors.confirmPassword}
         rightEl={<EyeBtn show={showCPw} toggle={() => setShowCPw((p) => !p)} />}
       />
-
+      
       {error && (
-        <div className="px-4 py-3 rounded-[10px] mb-[18px] bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.25)] text-[14px] text-[#fca5a5] font-['DM_Sans',system-ui,sans-serif]">
+        <div className="px-4 py-3 rounded-[10px] mb-[18px] bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.25)] text-[14px] text-[#ffffff] font-['DM_Sans',system-ui,sans-serif]">
           {error}
         </div>
       )}
