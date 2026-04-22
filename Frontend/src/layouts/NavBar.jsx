@@ -66,6 +66,12 @@ const NavBar = () => {
         <div className="hidden md:flex gap-[10px] items-center">
           {user ? (
             <div className="flex gap-5">
+              <Link
+                to="/cart"
+                className="no-underline px-[20px] py-[9px] rounded-[10px] border border-[rgba(245,240,232,0.15)] text-[rgba(245,240,232,0.85)] text-sm font-medium font-['DM_Sans',system-ui,sans-serif]"
+              >
+                Cart
+              </Link>
               <UserAvatar name={user.name} avatarLink={user.avatar} />
               <button
                 onClick={handleLogout}

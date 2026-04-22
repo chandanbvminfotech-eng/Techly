@@ -1,29 +1,39 @@
 import Cart from "../models/cart.model.js";
 import Product from "../models/product.model.js";
 import { ApiError } from "../utils/apiError.js";
-import mongoose from "mongoose";
+import mongoose, { get } from "mongoose";
+
+
+const getPopulatedCart = async (userId) => {
+  return await Cart.findOne({ userId }).populate({
+    path: "items.productId",
+    select: "name price images brand",
+  });
+};
+
+
 
 const addProductToCart = async ({ productId, userId, quantity }) => {
   // user clicks on add button ==> request is send with productId,quantity to post cart api
   // it checks validation of these ids and check if product exists in db
   // then we add the product to cart using create
-
   if (!productId || !quantity) {
     throw new ApiError(400, "ProductId and quantity is required");
   }
   if (!userId) {
     throw new ApiError(400, "Unauthorized");
-    }
-    if (!mongoose.Types.ObjectId.isValid(productId)) {
-      throw new ApiError(400, "Invalid ProductId");
-    }
+  }
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    throw new ApiError(400, "Invalid ProductId");
+  }
   const product = await Product.findById(productId).select("price");
   if (!product) {
     throw new ApiError(400, "Product not found in db");
   }
-
+  
   const cart = await Cart.findOne({ userId });
 
+  
   let productToBeAdded;
   if (!cart) {
     return await Cart.create({
@@ -37,16 +47,25 @@ const addProductToCart = async ({ productId, userId, quantity }) => {
       ],
     });
   }
+  
 
   const existingItem = cart.items.find(
     (item) => item.productId.toString() === productId,
-    );
-    if (existingItem.quantity + quantity > 10) {
-      throw new ApiError(400, "Maximum quantity is 10");
-    }
+  );
+
+
   if (existingItem) {
+    // 2. If it exists, check the limit and update
+    if (existingItem.quantity + quantity > 10) {
+      throw new ApiError(400, "Maximum quantity per item is 10");
+    }
     existingItem.quantity += quantity;
   } else {
+    // 3. If it's a new item, check if the NEW quantity is over 10 (unlikely but safe)
+    if (quantity > 10) {
+      throw new ApiError(400, "Maximum quantity is 10");
+    }
+    // 4. Push new item
     cart.items.push({
       productId,
       priceSnapshot: product.price,
@@ -63,7 +82,7 @@ const getCartData = async (userId) => {
   if (!userId) {
     throw new ApiError(400, "Unauthorized");
   }
-  const cart = await Cart.findOne({ userId }).populate("items.productId","name images price brand");
+  const cart = await getPopulatedCart(userId)
   if (!cart) {
     return cart || { items: [] };
   }
@@ -96,7 +115,7 @@ const deleteSingleProductDataFromCart = async ({ productId, userId }) => {
   const cart = await Cart.findOne({ userId });
   if (!cart) {
     throw new ApiError(400, "No Data to delete in cart is empty");
-    }
+  }
   const existingProduct = cart.items.find(
     (item) => item.productId.toString() === productId,
   );
@@ -123,7 +142,7 @@ const updateQuantityInCart = async ({ productId, userId, quantity }) => {
   if (quantity < 1) {
     throw new ApiError(400, "Quantity should be at least 1");
   }
-  const cart = await Cart.findOne({ userId });
+  const cart = await Cart.findOne({ userId })
   if (!cart) {
     throw new ApiError(400, "No Data to delete in cart is empty");
   }
@@ -134,8 +153,9 @@ const updateQuantityInCart = async ({ productId, userId, quantity }) => {
     throw new ApiError(400, "Product is not in cart can't be removed");
   }
   existingProduct.quantity = quantity;
-  const updatedCart = await cart.save();
-  return updatedCart;
+  await cart.save();
+
+  return await getPopulatedCart(userId);
 };
 
 export {

@@ -12,7 +12,7 @@ const ProductPage = () => {
   }, [dispatch]);
 
   if (loading) return <p className="text-white p-6">Loading...</p>;
-  if (error) return <p className="text-red-400 p-6">{error}</p>;
+  if (error) return <p className="text-red-400 p-6">Error...{error}</p>;
 
   return (
     <div className="bg-[#08080E] min-h-screen px-6 py-10">
