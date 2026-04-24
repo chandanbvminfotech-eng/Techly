@@ -3,7 +3,6 @@ import Product from "../models/product.model.js";
 import { ApiError } from "../utils/apiError.js";
 import mongoose, { get } from "mongoose";
 
-
 const getPopulatedCart = async (userId) => {
   return await Cart.findOne({ userId }).populate({
     path: "items.productId",
@@ -11,12 +10,11 @@ const getPopulatedCart = async (userId) => {
   });
 };
 
-
-
 const addProductToCart = async ({ productId, userId, quantity }) => {
   // user clicks on add button ==> request is send with productId,quantity to post cart api
   // it checks validation of these ids and check if product exists in db
   // then we add the product to cart using create
+
   if (!productId || !quantity) {
     throw new ApiError(400, "ProductId and quantity is required");
   }
@@ -30,10 +28,9 @@ const addProductToCart = async ({ productId, userId, quantity }) => {
   if (!product) {
     throw new ApiError(400, "Product not found in db");
   }
-  
+
   const cart = await Cart.findOne({ userId });
 
-  
   let productToBeAdded;
   if (!cart) {
     return await Cart.create({
@@ -47,12 +44,11 @@ const addProductToCart = async ({ productId, userId, quantity }) => {
       ],
     });
   }
-  
+
 
   const existingItem = cart.items.find(
     (item) => item.productId.toString() === productId,
   );
-
 
   if (existingItem) {
     // 2. If it exists, check the limit and update
@@ -73,16 +69,16 @@ const addProductToCart = async ({ productId, userId, quantity }) => {
     });
   }
 
-  productToBeAdded = await cart.save();
+   await cart.save();
 
-  return productToBeAdded;
+  return await getPopulatedCart(userId);
 };
 
 const getCartData = async (userId) => {
-  if (!userId) {
-    throw new ApiError(400, "Unauthorized");
-  }
-  const cart = await getPopulatedCart(userId)
+  // if (!userId) {
+  //   throw new ApiError(401,"Unauthorized")
+  // }
+  const cart = await getPopulatedCart(userId);
   if (!cart) {
     return cart || { items: [] };
   }
@@ -126,7 +122,7 @@ const deleteSingleProductDataFromCart = async ({ productId, userId }) => {
     (item) => item.productId.toString() !== productId,
   );
   await cart.save();
-  return "Success in deleting";
+  return await getPopulatedCart(userId);
 };
 
 const updateQuantityInCart = async ({ productId, userId, quantity }) => {
@@ -142,7 +138,7 @@ const updateQuantityInCart = async ({ productId, userId, quantity }) => {
   if (quantity < 1) {
     throw new ApiError(400, "Quantity should be at least 1");
   }
-  const cart = await Cart.findOne({ userId })
+  const cart = await Cart.findOne({ userId });
   if (!cart) {
     throw new ApiError(400, "No Data to delete in cart is empty");
   }

@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { updateCartQuantity } from "../cartSlice";
+import { deleteSingleItemCart, updateCartQuantity } from "../cartSlice";
 
 const Cart = ({ cart }) => {
   const dispatch = useDispatch();
@@ -13,15 +13,26 @@ const Cart = ({ cart }) => {
       }),
     );
   };
+
   const handleSubtractQuantity = async () => {
-    await dispatch(
-      updateCartQuantity({
-        productId: cart.productId.id,
-        quantity: cart.quantity - 1,
-      }),
-    );
+    if (cart.quantity === 1) {
+      await dispatch(deleteSingleItemCart({productId:cart.productId.id}))
+    }
+    else {
+      await dispatch(
+        updateCartQuantity({
+          productId: cart.productId.id,
+          quantity: cart.quantity - 1,
+        }),
+      );
+    }
   };
-  console.log(cart);
+  const handleDeleteItemCart = async () => {
+    await dispatch(deleteSingleItemCart({
+      productId:cart.productId.id
+    }))
+  }
+  // console.log("CART",cart)
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[5fr_1fr_1fr_1fr] gap-6 px-10 py-10 items-center transition-all duration-500 hover:bg-white/[0.02]">
@@ -29,7 +40,7 @@ const Cart = ({ cart }) => {
       <div className="flex items-center gap-8">
         <div className="group/img relative w-[100px] h-[100px] shrink-0 bg-white rounded-2xl border border-white/5 p-4 flex items-center justify-center ">
           <img
-            src={cart.productId.images[0].url}
+            src={cart.productId?.images?.[0].url}
             alt={cart.productId.name}
             className="w-full h-full object-contain transition-transform duration-700"
           />
@@ -43,7 +54,10 @@ const Cart = ({ cart }) => {
             {cart.productId.description}
           </span>
           {/* Subtle Remove Trigger */}
-          <button className="text-[10px] bg-white/[0.03] border border-white/5 hover:border-red-500/30 hover:bg-red-500/10 text-[rgba(245,240,232,0.5)] hover:text-red-400 px-3 py-1.5 rounded-full transition-all duration-300 uppercase tracking-[0.15em] font-medium mt-2 w-fit">
+          <button
+            className="text-[10px] bg-white/[0.03] border border-white/5 hover:border-red-500/30 hover:bg-red-500/10 text-[rgba(245,240,232,0.5)] hover:text-red-400 px-3 py-1.5 rounded-full transition-all duration-300 uppercase tracking-[0.15em] font-medium mt-2 w-fit"
+            onClick={handleDeleteItemCart}
+          >
             Remove from vault
           </button>
         </div>
@@ -55,7 +69,7 @@ const Cart = ({ cart }) => {
           Unit Price
         </span>
         <span className="text-[#F5F0E8]/90 font-light text-base">
-          ${cart.productId.price.toLocaleString()}
+          ${cart?.productId?.price?.toLocaleString()}
         </span>
       </div>
 
@@ -89,7 +103,7 @@ const Cart = ({ cart }) => {
           Total
         </span>
         <div className="font-[Georgia,serif] text-[#F5E090] text-xl tracking-tight italic">
-          ${(cart.quantity * cart.productId.price).toLocaleString()}
+          ₹{(cart.quantity * cart.productId.price).toLocaleString()}
         </div>
       </div>
     </div>

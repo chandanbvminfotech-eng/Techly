@@ -5,19 +5,22 @@ import User from "../models/user.model.js";
 import { ApiError } from "../utils/apiError.js";
 
 const verifyJWT = asyncHandler(async (req, res, next) => {
+  const token = req.cookies?.accessToken;
+  if (!token) {
+    throw new ApiError(401, "Unauthorized request");
+  }
   try {
-    const token = req.cookies?.accessToken;                // || req.header("Authorization")?.replace("Bearer ", "");
     const decodedToken = jwt.verify(token, JWT_ACCESS_SECRET);
-
     const user = await User.findById(decodedToken?._id).select("_id role");
 
     if (!user) {
       throw new ApiError(401, "Invalid Access Token");
     }
+
     req.user = user;
     next();
   } catch (error) {
-    throw new ApiError(400, error?.message, "Invalid access token");
+    throw new ApiError(401, error?.message || "Invalid access token");
   }
 });
 

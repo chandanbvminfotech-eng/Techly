@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { clearError, loginUser } from "../authSlice.js";
+import { useNavigate } from "react-router-dom";
 
 const Input = ({
   label,
@@ -56,6 +57,7 @@ const Input = ({
 
 const LoginForm = () => {
   const dispatch = useDispatch();
+  const navigate=useNavigate()
   const { loading, error } = useSelector((state) => state.auth);
   const [formData, setFormData] = useState({
     email: "",
@@ -70,7 +72,11 @@ const LoginForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(loginUser(formData));
+    const result=dispatch(loginUser(formData));
+    if (loginUser.fulfilled.match(result)) {
+      navigate("/");
+    }
+
   };
 
   const handleChange = (e) =>

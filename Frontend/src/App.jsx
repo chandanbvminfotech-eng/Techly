@@ -1,10 +1,11 @@
-import { BrowserRouter, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import "./App.css";
 import AppRoutes from "./routes/AppRoutes";
 import NavBar from "./layouts/NavBar";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { getMe } from "./features/auth/authSlice";
+import LoadingScreen from "./components/LoadingScreen";
 
 const Layout = () => {
   const location = useLocation();
@@ -19,14 +20,17 @@ const Layout = () => {
 
 function App() {
   const dispatch = useDispatch();
+  const { isInitialized } = useSelector((state) => state.auth);
   useEffect(() => {
-    dispatch(getMe());
+    if (!isInitialized) {
+      // ✅ only run if not already initialized
+      dispatch(getMe());
+    }
   }, []);
-  return (
-    <BrowserRouter>
-      <Layout />
-    </BrowserRouter>
-  );
+  if (!isInitialized) {
+    return <LoadingScreen />;
+  }
+  return <Layout />;
 }
 
 export default App;

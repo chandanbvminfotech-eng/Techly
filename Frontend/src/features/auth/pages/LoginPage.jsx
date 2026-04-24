@@ -146,7 +146,7 @@ const LoginPage = () => {
               </span>
             </div>
             <span className="text-[20px] text-[#F5F0E8] font-[Georgia,serif]">
-              Luxe
+              Techly
             </span>
           </Link>
 

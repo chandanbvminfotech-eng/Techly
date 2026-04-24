@@ -16,10 +16,12 @@ app.use(cookieParser())
 
 app.use("/api/v1",routes);
 
-app.get("/", (req, res) => {
-    console.log("Test Route");
-    res.send("Working home route");
+app.use((req, res, next, err) => {
+    const statusCode = err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+    return res.status(statusCode).json({success:false,statusCode,message})
 })
+
 
 
 export default app;

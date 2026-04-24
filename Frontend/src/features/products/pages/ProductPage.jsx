@@ -2,9 +2,11 @@ import React, { useEffect } from "react";
 import { getProducts } from "../productSlice";
 import { useDispatch, useSelector } from "react-redux";
 import ProductCard from "../components/ProductCard";
+import { getCartData } from "../../cart/cartSlice";
 
 const ProductPage = () => {
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
   const { products, loading, error } = useSelector((state) => state.products);
 
   useEffect(() => {

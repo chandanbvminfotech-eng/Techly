@@ -1,16 +1,25 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getCartData } from "../cartSlice.js";
+import { deleteCart, getCartData } from "../cartSlice.js";
 import Cart from "../components/Cart.jsx";
+import { useNavigate } from "react-router-dom";
 
 const CartPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { cart, loading, error } = useSelector((state) => state.cart);
+    const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
-    dispatch(getCartData());
+    if (user) {
+      dispatch(getCartData());
+    }
   }, [dispatch]);
 
+  const handleClearCart = async () => {
+    await dispatch(deleteCart());
+    navigate("/cart");
+  };
 
   if (error)
     return (
@@ -48,7 +57,7 @@ const CartPage = () => {
 
             {/* Items */}
             <div className="divide-y divide-white/5">
-              {cart?.items.length > 0 ? (
+              {cart?.items?.length > 0 ? (
                 cart.items.map((item) => (
                   <Cart key={item.productId._id} cart={item} />
                 ))
@@ -77,16 +86,27 @@ const CartPage = () => {
                       Estimated Total
                     </span>
                     <span className="text-[36px] font-[Georgia,serif] text-[#F5E090] leading-none">
-                      ${cart?.totalAmount?.toLocaleString()}
+                      ₹{cart?.totalAmount?.toLocaleString()}
                     </span>
                   </div>
 
-                  <button className="group relative overflow-hidden bg-[#D4AF37] px-12 py-5 rounded-full transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(212,175,55,0.2)] active:scale-95">
-                    <span className="relative z-10 text-[#08080E] text-sm font-black uppercase tracking-[0.2em]">
-                      Proceed To Checkout
-                    </span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                  </button>
+                  <div className="flex flex-row gap-8">
+                    <button
+                      className="group relative overflow-hidden bg-[#27161B] px-6 py-3 rounded-full transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(212,175,55,0.2)] active:scale-95"
+                      onClick={handleClearCart}
+                    >
+                      <span className="relative z-10 text-slate-200  text-sm font-black uppercase tracking-[0.2em]">
+                        Clear Cart
+                      </span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                    </button>
+                    <button className="group relative overflow-hidden bg-[#D4AF37] px-6 py-3 rounded-full transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(212,175,55,0.2)] active:scale-95">
+                      <span className="relative z-10 text-[#08080E] text-sm font-black uppercase tracking-[0.2em]">
+                        Proceed To Checkout
+                      </span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

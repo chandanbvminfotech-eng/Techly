@@ -14,6 +14,7 @@ export const loginUser = createAsyncThunk(
     }
   },
 );
+
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async (formData, thunkAPI) => {
@@ -46,8 +47,16 @@ export const logoutUser = createAsyncThunk(
 export const getMe = createAsyncThunk("auth/getMe", async (_, thunkAPI) => {
   try {
     const { data } = await api.get("/auth/me");
+    console.log(data)
     return data.data;
   } catch (error) {
+    if (
+      !error.response ||
+      error.response.status === 401 ||
+      error.response.status >= 500
+    ) {
+      return null;
+    }
     return thunkAPI.rejectWithValue(
       error.response?.data?.message || "Failed to fetch data",
     );
@@ -60,6 +69,7 @@ const authSlice = createSlice({
     user: null,
     loading: false,
     error: null,
+    isInitialized: false,
     registerSuccess: false,
   },
   reducers: {
@@ -79,6 +89,7 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload.user;
+        state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -108,11 +119,20 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(getMe.fulfilled, (state, action) => {
-        state.user = action.payload;
+      .addCase(getMe.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
-      .addCase(getMe.rejected, (state) => {
+      .addCase(getMe.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+        state.isInitialized = true; // Check complete!
+        state.error = null;
+      })
+      .addCase(getMe.rejected, (state, action) => {
+        state.loading = false;
         state.user = null;
+        state.isInitialized = true;
       });
   },
 });

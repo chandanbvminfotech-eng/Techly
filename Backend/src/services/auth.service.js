@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import { ApiError } from "../utils/apiError.js";
 import { JWT_REFRESH_SECRET } from "../config/index.js";
 import jwt from "jsonwebtoken";
+import Cart from "../models/cart.model.js";
 
 // generate access,refreshtoken
 const generateAccessRefreshToken = async (userId) => {
@@ -34,6 +35,14 @@ const signUp = async (body) => {
     email: normalizedEmail,
     password,
   });
+
+  const cartCreate = await Cart.create({
+    userId: user._id,
+    items: [],
+  });
+  if (!cartCreate) {
+    return new ApiError(400, "Problem in creating cart");
+  }
 
   const createdUser = await User.findById(user._id).select(
     "-password -refreshToken",

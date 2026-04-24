@@ -21,7 +21,7 @@ import cartReducer from "../features/cart/cartSlice.js"
 const authPersistConfig = {
   key: "auth",
   storage,
-  whitelist: ["user"],
+  whitelist: ["user", "isInitialized"],
 };
 
 const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
