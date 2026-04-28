@@ -79,12 +79,16 @@ const NavBar = () => {
               </Link>
 
               {/* User Profile - visible on all screens */}
+              <Link
+                to="/profile"
+              >
               <div className="flex items-center gap-2">
-                <UserAvatar name={user.name} avatarLink={user.avatar} />
+                <UserAvatar name={user.name} avatarLink={user.avatar?.[0]?.url} />
                 <span className="text-[#F5F0E8] text-sm font-medium hidden sm:inline">
                   {user.name}
                 </span>
               </div>
+              </Link>
 
               {/* Sign Out - hidden on mobile, visible on desktop */}
               <button

@@ -4,20 +4,19 @@ import { addItemCart, deleteSingleItemCart, updateCartQuantity } from "../../car
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product,cart,user }) => {
   const [hovered, setHovered] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { cart } = useSelector((state) => state.cart);
-  const user = useSelector((state) => state.auth.user);
+
   const cartItem = cart?.items?.find(
     (item) => item.productId.id === product._id,
   );
+  // console.log(cartItem)
 
   // if (typeof cartItem !== "undefined") {                               // used for checking
   //   console.log("CartItem", cartItem);
   // }
-
 
   
   const handleAddToCart = async () => {

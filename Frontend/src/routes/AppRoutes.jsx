@@ -6,8 +6,9 @@ import LoginPage from "../features/auth/pages/LoginPage";
 import RegisterPage from "../features/auth/pages/RegisterPage";
 import ProductPage from "../features/products/pages/ProductPage";
 import SingleProductPage from "../features/products/pages/SingleProductPage";
-import ProtectedRoute from "../routes/ProtectedRoute"
+import ProtectedRoute from "../routes/ProtectedRoute";
 import CartPage from "../features/cart/pages/CartPage";
+import ProfilePage from "../features/profile/pages/ProfilePage";
 const AppRoutes = () => {
   return (
     <>
@@ -18,7 +19,8 @@ const AppRoutes = () => {
         <Route path="/products" element={<ProductPage />} />
         <Route path="/products/:id" element={<SingleProductPage />} />
         <Route element={<ProtectedRoute />}>
-          <Route path="/cart" element={<CartPage />}/>
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

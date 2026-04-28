@@ -1,7 +1,12 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { deleteSingleItemCart, updateCartQuantity } from "../../cart/cartSlice";
-import { useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  addItemCart,
+  deleteSingleItemCart,
+  updateCartQuantity,
+} from "../../cart/cartSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { ApiError } from "../../../../../Backend/src/utils/apiError";
 
 const SpecRow = ({ icon, label, value }) => (
   <div className="flex items-center gap-3 py-3 border-b border-[rgba(245,240,232,0.06)] last:border-0 group">
@@ -39,52 +44,65 @@ const StockBadge = ({ stock }) => {
   );
 };
 
-const SingleProduct = ({ product }) => {
+const SingleProduct = ({ product, cart, user }) => {
   const [activeImg, setActiveImg] = useState(0);
   const [added, setAdded] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const images = product.images?.length ? product.images : [{ url: "" }];
+  const cartItem = cart?.items?.find(
+    (item) => item.productId.id === product._id,
+  );
 
-  const handleAddToCart = () => {
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2200);
+
+  const handleAddToCart = async () => {
+    if (!user) {
+      localStorage.setItem("redirectAfterLogin", `/products/${product._id}`);
+      navigate("/signin", {
+        state: { from: `/products/${product._id}`, productId: product._id },
+      });
+      return;
+    }
+    try {
+      await dispatch(
+        addItemCart({
+          productId: product._id,
+          quantity: quantity,
+        }),
+      );
+      setAdded(true);
+      setTimeout(() => setAdded(false), 2200);
+    } catch (err) {
+      throw new ApiError(400, "Error in adding to cart");
+    }
   };
-  
-  const { cart } = useSelector((state) => state.cart);
-    const user = useSelector((state) => state.auth.user);
-  console.log(cart)
-    // const handleAddToCart = async () => {
-    //   await dispatch(
-    //     addItemCart({
-    //       productId: product._id,
-    //       quantity: 1,
-    //     }),
-    //   );
-    // };
-    // const handleAddQuantity = async () => {
-    //   await dispatch(
-    //     updateCartQuantity({
-    //       productId: cart.productId.id,
-    //       quantity: cart.quantity + 1,
-    //     }),
-    //   );
-    // };
-  
-    // const handleSubtractQuantity = async () => {
-    //   if (cart.quantity === 1) {
-    //     await dispatch(deleteSingleItemCart({productId:cart.productId.id}))
-    //   }
-    //   else {
-    //     await dispatch(
-    //       updateCartQuantity({
-    //         productId: cart.productId.id,
-    //         quantity: cart.quantity - 1,
-    //       }),
-    //     );
-    //   }
-    // };
+
+  const handleAddQuantity = async () => {
+    await dispatch(
+      updateCartQuantity({
+        productId: cartItem.productId._id,
+        quantity: cartItem.quantity + 1,
+      }),
+    );
+  };
+
+  const handleSubtractQuantity = async () => {
+    if (cartItem.quantity === 1) {
+      await dispatch(
+        deleteSingleItemCart({ productId: cartItem.productId._id }),
+      );
+    } else {
+      await dispatch(
+        updateCartQuantity({
+          productId: cartItem.productId._id,
+          quantity: cartItem.quantity - 1,
+        }),
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0C0D11] font-['DM_Sans',system-ui,sans-serif]">
@@ -202,90 +220,99 @@ const SingleProduct = ({ product }) => {
               </h3>
               <div className="bg-[rgba(245,240,232,0.02)] rounded-xl border border-[rgba(245,240,232,0.06)] overflow-hidden">
                 <div className="p-4 space-y-1">
-                  {product.ram && (
-                    <SpecRow label="RAM" value={product.ram} />
-                  )}
+                  {product.ram && <SpecRow label="RAM" value={product.ram} />}
                   {product.storage && (
-                    <SpecRow
-                      label="Storage"
-                      value={product.storage}
-                    />
+                    <SpecRow label="Storage" value={product.storage} />
                   )}
                   {product.processor && (
-                    <SpecRow
-                      label="Processor"
-                      value={product.processor}
-                    />
+                    <SpecRow label="Processor" value={product.processor} />
                   )}
                   {product.battery && (
-                    <SpecRow
-                      label="Battery"
-                      value={`${product.battery} mAh`}
-                    />
+                    <SpecRow label="Battery" value={`${product.battery} mAh`} />
                   )}
                 </div>
               </div>
             </div>
 
             {/* Quantity Selector */}
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-[rgba(245,240,232,0.72)]">
-                Quantity:
-              </span>
-              <div className="flex items-center gap-2 bg-[rgba(245,240,232,0.05)] rounded-lg border border-[rgba(245,240,232,0.1)]">
+            {!cartItem && (
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-[rgba(245,240,232,0.72)]">
+                  Quantity:
+                </span>
+                <div className="flex items-center gap-2 bg-[rgba(245,240,232,0.05)] rounded-lg border border-[rgba(245,240,232,0.1)]">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="w-8 h-8 flex items-center justify-center hover:bg-[rgba(245,240,232,0.1)] rounded-l-lg transition"
+                  >
+                    -
+                  </button>
+                  <span className="w-12 text-center text-sm font-medium text-[#F5F0E8]">
+                    {quantity}
+                  </span>
+                  <button
+                    onClick={() =>
+                      setQuantity(Math.min(product.stock, quantity + 1))
+                    }
+                    className="w-8 h-8 flex items-center justify-center hover:bg-[rgba(245,240,232,0.1)] rounded-r-lg transition"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+
+            {!cartItem ? (
+              <div className="flex gap-3 pt-2">
                 <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-8 h-8 flex items-center justify-center hover:bg-[rgba(245,240,232,0.1)] rounded-l-lg transition"
+                  onClick={handleAddToCart}
+                  disabled={product.stock === 0}
+                  className={`flex-1 relative py-3.5 px-6 rounded-xl font-semibold text-sm tracking-wide transition-all duration-200 active:scale-[0.98]
+        ${
+          product.stock === 0
+            ? "bg-white/5 text-white/30 cursor-not-allowed"
+            : added
+              ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+              : "bg-[#D4AF37] text-black hover:bg-[#B8941E] shadow-lg shadow-[#D4AF37]/20"
+        }`}
+                >
+                  <span
+                    className={`transition-opacity duration-300 ${added ? "opacity-0" : "opacity-100"}`}
+                  >
+                    {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+                  </span>
+                  {added && (
+                    <span className="absolute inset-0 flex items-center justify-center font-bold">
+                      ✓ Added
+                    </span>
+                  )}
+                </button>
+
+                <button className="w-12 flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] hover:border-[#D4AF37] hover:bg-[#D4AF37]/10 text-white/60 hover:text-[#D4AF37] transition-all duration-200">
+                  <span className="text-xl leading-none">♡</span>
+                </button>
+              </div>
+            ) : (
+              <div className="w-32 flex items-center bg-white/[0.03] border border-white/10 rounded-xl p-1">
+                <button
+                  onClick={handleSubtractQuantity}
+                  className="flex-1 h-8 flex items-center justify-center text-[#D4AF37] hover:bg-white/5 rounded-lg transition-colors"
                 >
                   -
                 </button>
-                <span className="w-12 text-center text-sm font-medium text-[#F5F0E8]">
-                  {quantity}
+                <span className="flex-1 text-center text-white text-sm font-bold">
+                  {cartItem.quantity}
                 </span>
                 <button
-                  onClick={() =>
-                    setQuantity(Math.min(product.stock, quantity + 1))
-                  }
-                  className="w-8 h-8 flex items-center justify-center hover:bg-[rgba(245,240,232,0.1)] rounded-r-lg transition"
+                  onClick={handleAddQuantity}
+                  className="flex-1 h-8 flex items-center justify-center text-[#D4AF37] hover:bg-white/5 rounded-lg transition-colors"
                 >
                   +
                 </button>
               </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-3 pt-2">
-              <button
-                onClick={handleAddToCart}
-                disabled={product.stock === 0}
-                className={`flex-1 relative py-4 px-6 rounded-xl font-bold text-sm tracking-wide
-                  transition-all duration-300 transform active:scale-95
-                  ${
-                    product.stock === 0
-                      ? "bg-[rgba(245,240,232,0.1)] text-[rgba(245,240,232,0.4)] cursor-not-allowed"
-                      : added
-                        ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30"
-                        : "bg-[#D4AF37] text-[#08080E] hover:bg-[#B8941E] shadow-lg shadow-[#D4AF37]/30"
-                  }`}
-              >
-                <span
-                  className={`transition-all ${added ? "opacity-0" : "opacity-100"}`}
-                >
-                  {product.stock === 0
-                    ? "Out of Stock"
-                    : `Add to Cart` }
-                </span>
-                {added && (
-                  <span className="absolute inset-0 flex items-center justify-center">
-                    ✓ Added to Cart!
-                  </span>
-                )}
-              </button>
-
-              <button className="w-12 rounded-xl border border-[rgba(245,240,232,0.15)] bg-[rgba(245,240,232,0.03)] hover:border-[#D4AF37] hover:bg-[#D4AF37]/10 text-[rgba(245,240,232,0.72)] hover:text-[#D4AF37] transition-all">
-                ♡
-              </button>
-            </div>
+            )}
 
             {/* Delivery Info */}
             <div className="bg-[rgba(245,240,232,0.02)] rounded-xl p-4 border border-[rgba(245,240,232,0.06)]">

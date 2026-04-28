@@ -2,7 +2,10 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import User from "../models/user.model.js";
-import { showUserProfile, updateUserProfile } from "../services/user.service.js";
+import {
+  showUserProfile,
+  updateUserProfile,
+} from "../services/user.service.js";
 
 // export const signUp = asyncHandler(async (req, res) => {
 //     const { name, email, password } = req.body;
@@ -25,7 +28,7 @@ import { showUserProfile, updateUserProfile } from "../services/user.service.js"
 
 const getUserData = asyncHandler(async (req, res) => {
   const result = await showUserProfile({
-    user: req.user,
+    userId: req.user._id,
   });
   return res
     .status(200)
@@ -33,13 +36,16 @@ const getUserData = asyncHandler(async (req, res) => {
 });
 
 const updateUserProfileController = asyncHandler(async (req, res) => {
-    const result = await updateUserProfile({
-        user: req.user,
-        body:req.body
-   })
+  const { name, email } = req.body;
+  const result = await updateUserProfile({
+    userId: req.user._id,
+    name,
+    email,
+    avatar:req.file
+  });
   return res
     .status(200)
     .json(new ApiResponse(200, result, "User details updated successfully"));
 });
 
-export { getUserData,updateUserProfileController };
+export { getUserData, updateUserProfileController };

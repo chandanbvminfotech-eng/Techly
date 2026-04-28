@@ -47,18 +47,10 @@ export const logoutUser = createAsyncThunk(
 export const getMe = createAsyncThunk("auth/getMe", async (_, thunkAPI) => {
   try {
     const { data } = await api.get("/auth/me");
-    console.log(data)
     return data.data;
   } catch (error) {
-    if (
-      !error.response ||
-      error.response.status === 401 ||
-      error.response.status >= 500
-    ) {
-      return null;
-    }
     return thunkAPI.rejectWithValue(
-      error.response?.data?.message || "Failed to fetch data",
+      error.response?.data?.message || "Not logged in",
     );
   }
 });

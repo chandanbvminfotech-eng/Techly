@@ -13,21 +13,19 @@ cloudinary.config({
   api_secret: CLOUDINARY_API_SECRET,
 });
 
-const uploadOnCloudinary = async (localFilePath) => {
+const uploadOnCloudinary = async (localFilePath,folder) => {
   if (!localFilePath) {
     throw new ApiError(400, "No file path provided");
   }
   try {
     const response = await cloudinary.uploader.upload(localFilePath, {
       resource_type: "auto",
-      folder: "products",
+      folder: folder || "products",
     });
-
     return response;
   } catch (error) {
     throw new ApiError(500, "Cloudinary upload failed");
   } finally {
-    
     if (fs.existsSync(localFilePath)) {
       fs.unlinkSync(localFilePath);
     }

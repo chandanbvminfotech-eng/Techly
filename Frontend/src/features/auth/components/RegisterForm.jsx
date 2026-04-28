@@ -1,72 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { clearError, registerUser } from "../authSlice.js";
-
-const FormInput = ({
-  label,
-  type,
-  name,
-  value,
-  onChange,
-  required,
-  placeholder,
-  rightEl,
-  error,
-}) => {
-  const [focused, setFocused] = useState(false);
-
-  return (
-    <div className="mb-[18px]">
-      <label
-        className={`block mb-[7px] text-[13px] font-medium transition-colors duration-200 font-['DM_Sans',system-ui,sans-serif]
-        ${
-          error
-            ? "text-[rgba(252,165,165,0.9)]"
-            : focused
-              ? "text-[#D4AF37]"
-              : "text-[rgba(245,240,232,0.6)]"
-        }`}
-      >
-        {label}
-      </label>
-
-      <div className="relative">
-        <input
-          type={type}
-          name={name}
-          value={value}
-          onChange={onChange}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          placeholder={placeholder}
-          required={required}
-          className={`w-full box-border text-[14px] rounded-[11px] font-['DM_Sans',system-ui,sans-serif]
-          bg-[rgba(255,255,255,0.04)] text-[#F5F0E8] outline-none transition-all duration-200
-          ${rightEl ? "pr-[48px] pl-[16px] py-[12px]" : "px-[16px] py-[12px]"}
-          ${
-            error
-              ? "border border-[rgba(239,68,68,0.5)] focus:shadow-[0_0_0_3px_rgba(239,68,68,0.1)]"
-              : focused
-                ? "border border-[rgba(212,175,55,0.55)] shadow-[0_0_0_3px_rgba(212,175,55,0.1)]"
-                : "border border-[rgba(255,255,255,0.1)]"
-          }`}
-        />
-
-        {rightEl && (
-          <div className="absolute right-[14px] top-1/2 -translate-y-1/2">
-            {rightEl}
-          </div>
-        )}
-      </div>
-
-      {error && (
-        <p className="mt-[5px] text-[12px] text-[#fca5a5] font-['DM_Sans',system-ui,sans-serif]">
-          {error}
-        </p>
-      )}
-    </div>
-  );
-};
+import { Input } from "../../../components/Input.jsx";
+  
 
 const RegisterForm = () => {
   const dispatch = useDispatch();
@@ -165,7 +101,7 @@ const RegisterForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      <FormInput
+      <Input
         label="Full Name"
         type="text"
         name="name"
@@ -175,7 +111,7 @@ const RegisterForm = () => {
         placeholder="Sofia Marchetti"
         error={fieldErrors.name}
       />
-      <FormInput
+      <Input
         label="Email Address"
         type="email"
         name="email"
@@ -185,7 +121,7 @@ const RegisterForm = () => {
         placeholder="you@example.com"
         error={fieldErrors.email}
       />
-      <FormInput
+      <Input
         label="Password"
         type={showPw ? "text" : "password"}
         name="password"
@@ -223,7 +159,7 @@ const RegisterForm = () => {
         </div>
       )}
 
-      <FormInput
+      <Input
         label="Confirm Password"
         type={showCPw ? "text" : "password"}
         name="confirmPassword"

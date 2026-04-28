@@ -8,13 +8,7 @@ const CartPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { cart, loading, error } = useSelector((state) => state.cart);
-    const user = useSelector((state) => state.auth.user);
-
-  useEffect(() => {
-    if (user) {
-      dispatch(getCartData());
-    }
-  }, [dispatch]);
+  const user = useSelector((state) => state.auth.user);
 
   const handleClearCart = async () => {
     await dispatch(deleteCart());

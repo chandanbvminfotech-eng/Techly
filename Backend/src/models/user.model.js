@@ -1,7 +1,12 @@
-import mongoose, { Schema,model } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { JWT_ACCESS_SECRET, JWT_ACCESS_EXPIRY, JWT_REFRESH_EXPIRY, JWT_REFRESH_SECRET } from "../config/index.js";
+import {
+  JWT_ACCESS_SECRET,
+  JWT_ACCESS_EXPIRY,
+  JWT_REFRESH_EXPIRY,
+  JWT_REFRESH_SECRET,
+} from "../config/index.js";
 
 const warehouseAddressSchema = new mongoose.Schema(
   {
@@ -67,11 +72,18 @@ const userSchema = new Schema(
         default: null,
       },
     },
-    avatar: {
-      type: String,
-      default:
-        "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?_=20150327203541",
-    },
+    avatar: [
+      {
+        url: {
+          type: String,
+          required: true,
+        },
+        public_id: {
+          type: String,
+          require: true,
+        },
+      },
+    ],
     isActive: {
       type: Boolean,
       default: true,
@@ -99,11 +111,11 @@ userSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-userSchema.methods.generateAccessToken =  function () {
+userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
       _id: this._id,
-      role:this.role
+      role: this.role,
     },
     JWT_ACCESS_SECRET,
     {
@@ -111,7 +123,7 @@ userSchema.methods.generateAccessToken =  function () {
     },
   );
 };
-userSchema.methods.generateRefreshToken =  function () {
+userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {
       _id: this._id,
@@ -122,8 +134,6 @@ userSchema.methods.generateRefreshToken =  function () {
     },
   );
 };
-
-
 
 const User = model("User", userSchema);
 

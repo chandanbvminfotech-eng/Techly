@@ -75,9 +75,9 @@ const addProductToCart = async ({ productId, userId, quantity }) => {
 };
 
 const getCartData = async (userId) => {
-  // if (!userId) {
-  //   throw new ApiError(401,"Unauthorized")
-  // }
+  if (!userId) {
+    throw new ApiError(401,"Unauthorized")
+  }
   const cart = await getPopulatedCart(userId);
   if (!cart) {
     return cart || { items: [] };

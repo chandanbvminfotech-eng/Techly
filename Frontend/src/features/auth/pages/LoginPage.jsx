@@ -48,8 +48,18 @@ const LoginPage = () => {
   const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
+  const redirectURI = localStorage.getItem("redirectAfterLogin");
+  // console.log(redirectURI);
+
   useEffect(() => {
-    if (user) navigate("/");
+    if (user) {
+      if (!redirectURI) {
+        navigate("/");
+      } else {
+        navigate(redirectURI);
+        localStorage.removeItem("redirectAfterLogin");
+      }
+    }
   }, [user, navigate]);
 
   return (

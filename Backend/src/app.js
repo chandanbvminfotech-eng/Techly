@@ -1,5 +1,5 @@
 import express from "express";
-import routes from "./routes/index.js";
+import router from "./routes/index.js";
 import cookieParser from "cookie-parser";
 import cors from "cors"
 const app = express();
@@ -14,7 +14,7 @@ app.use(express.static("public"));
 app.use(cookieParser())
 
 
-app.use("/api/v1",routes);
+app.use("/api/v1",router);
 
 app.use((req, res, next, err) => {
     const statusCode = err.statusCode || 500;

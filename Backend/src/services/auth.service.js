@@ -34,6 +34,11 @@ const signUp = async (body) => {
     name: name.trim(),
     email: normalizedEmail,
     password,
+    avatar: {
+      url: "https://res.cloudinary.com/dmeckzuil/image/upload/v1777367214/vector-icon-user-avatar-web-site-mobile-app-man-face-flat-style-social-network-profile-45836554_yycwlk.webp",
+      public_id:
+        "vector-icon-user-avatar-web-site-mobile-app-man-face-flat-style-social-network-profile-45836554_yycwlk",
+    },
   });
 
   const cartCreate = await Cart.create({

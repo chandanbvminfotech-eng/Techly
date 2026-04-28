@@ -22,12 +22,12 @@ const createProduct = async ({ body, files, userId }) => {
   }
 
   const filesToUpload = files;
+  const folderName = "products"
   const uploadmultiple = filesToUpload.map((file) =>
-    uploadOnCloudinary(file.path),
+    uploadOnCloudinary(file.path,folderName),
   );
   console.log("All images uploaded");
   const results = await Promise.all(uploadmultiple);
-
   const imagesCollection = results
     .filter((r) => r !== null)
     .map((r) => ({
@@ -298,8 +298,10 @@ const updateProduct = async ({ productId, userId, role, body, files }) => {
     finalImages = imagesToBeKept;
   }
 
+
   if (files && files.length > 0) {
-    const uploadPromises = files.map((file) => uploadOnCloudinary(file.path));
+    const folderName="avatar"
+    const uploadPromises = files.map((file) => uploadOnCloudinary(file.path,folderName));
 
     const results = await Promise.all(uploadPromises);
 

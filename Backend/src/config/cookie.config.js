@@ -7,7 +7,7 @@ export const cookieOptions = {
 
 export const accessTokenCookieOptions = {
   ...cookieOptions,
-  maxAge: 9 * 1000,
+  maxAge: 15 * 60 * 1000,
 };
 export const refreshTokenCookieOptions = {
   ...cookieOptions,

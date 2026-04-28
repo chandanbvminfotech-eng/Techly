@@ -6,12 +6,14 @@ import { getCartData } from "../../cart/cartSlice";
 
 const ProductPage = () => {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.auth.user);
   const { products, loading, error } = useSelector((state) => state.products);
+  const { cart } = useSelector((state) => state.cart);  
+  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     dispatch(getProducts({ limit: 8 }));
   }, [dispatch]);
+
 
   if (loading) return <p className="text-white p-6">Loading...</p>;
   if (error) return <p className="text-red-400 p-6">Error...{error}</p>;
@@ -22,7 +24,7 @@ const ProductPage = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {products.map((product) => (
-          <ProductCard key={product._id} product={product} />
+          <ProductCard key={product._id} product={product} cart={cart} user={user} />
         ))}
       </div>
     </div>
