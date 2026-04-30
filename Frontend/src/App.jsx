@@ -4,9 +4,10 @@ import AppRoutes from "./routes/AppRoutes";
 import NavBar from "./layouts/NavBar";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { getMe } from "./features/auth/authSlice";
+import { getMe, logout } from "./features/auth/authSlice";
 import LoadingScreen from "./components/LoadingScreen";
 import { getCartData } from "./features/cart/cartSlice";
+import api from "./api/axios";
 
 const Layout = () => {
   const location = useLocation();
@@ -21,18 +22,21 @@ const Layout = () => {
 
 function App() {
   const dispatch = useDispatch();
-  const { isInitialized } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
-      dispatch(getMe()).then((result) => {
-        if (getMe.fulfilled.match(result)) {
-          dispatch(getCartData());
-        }
-      });
+    dispatch(getMe()).then((result) => {
+      if (getMe.fulfilled.match(result)) {
+        dispatch(getCartData());
+      } else {
+        api
+          .post("/auth/refresh-token")
+          .then(() => dispatch(getMe()))
+          .catch(() => dispatch(logout())); 
+      }
+    });
   }, []);
-  if (!isInitialized) {
-    return <LoadingScreen />;
-  }
+
   return <Layout />;
 }
 

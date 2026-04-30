@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutUser } from "../features/auth/authSlice";
 import UserAvatar from "../components/UserAvatar";
+import { clearCart } from "../features/cart/cartSlice";
 
 const NavBar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -14,6 +15,7 @@ const NavBar = () => {
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
+    dispatch(clearCart());
     navigate("/");
   };
 
@@ -24,6 +26,18 @@ const NavBar = () => {
   }, []);
 
   useEffect(() => setMenuOpen(false), [location]);
+
+  // Define navigation links based on user role
+  const navLinks = [
+    { to: "/", l: "Home" },
+    { to: "/products", l: "Products" },
+    { to: "#trending", l: "Trending" },
+  ];
+
+  // Add Dashboard link ONLY if user is a seller
+  if (user?.role === "seller") {
+    navLinks.push({ to: "/seller", l: "Dashboard" });
+  }
 
   return (
     <nav
@@ -49,13 +63,9 @@ const NavBar = () => {
           </span>
         </Link>
 
-        {/* Desktop Nav */}
+        {/* Desktop Nav - Conditionality applied via navLinks array */}
         <div className="hidden md:flex gap-1">
-          {[
-            { to: "/", l: "Home" },
-            { to: "/products", l: "Products" },
-            { to: "#trending", l: "Trending" },
-          ].map(({ to, l }) => (
+          {navLinks.map(({ to, l }) => (
             <Link
               key={l}
               to={to}
@@ -66,11 +76,10 @@ const NavBar = () => {
           ))}
         </div>
 
-        {/* Right side - Auth, Cart, Profile for all screen sizes */}
+        {/* Right side - Auth, Cart, Profile */}
         <div className="flex gap-[10px] items-center">
           {user ? (
             <>
-              {/* Cart Button - visible on all screens */}
               <Link
                 to="/cart"
                 className="no-underline px-[16px] sm:px-[20px] py-[9px] rounded-[10px] border border-[rgba(245,240,232,0.15)] text-[rgba(245,240,232,0.85)] text-sm font-medium font-['DM_Sans',system-ui,sans-serif] hover:text-[#D4AF37] transition-colors"
@@ -78,19 +87,18 @@ const NavBar = () => {
                 Cart
               </Link>
 
-              {/* User Profile - visible on all screens */}
-              <Link
-                to="/profile"
-              >
-              <div className="flex items-center gap-2">
-                <UserAvatar name={user.name} avatarLink={user.avatar?.[0]?.url} />
-                <span className="text-[#F5F0E8] text-sm font-medium hidden sm:inline">
-                  {user.name}
-                </span>
-              </div>
+              <Link to="/profile">
+                <div className="flex items-center gap-2">
+                  <UserAvatar
+                    name={user.name}
+                    avatarLink={user.avatar?.[0]?.url}
+                  />
+                  <span className="text-[#F5F0E8] text-sm font-medium hidden sm:inline">
+                    {user.name}
+                  </span>
+                </div>
               </Link>
 
-              {/* Sign Out - hidden on mobile, visible on desktop */}
               <button
                 onClick={handleLogout}
                 className="hidden md:block px-[22px] py-[9px] rounded-[10px] border border-[rgba(212,175,55,0.4)] bg-transparent text-[#D4AF37] text-sm font-medium font-['DM_Sans',system-ui,sans-serif] hover:bg-[rgba(212,175,55,0.1)] transition-colors"
@@ -115,7 +123,7 @@ const NavBar = () => {
             </>
           )}
 
-          {/* Mobile Menu Button - Only visible on mobile */}
+          {/* Mobile Menu Button */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="md:hidden bg-none border-none cursor-pointer text-[#F5F0E8] p-[6px]"
@@ -183,11 +191,8 @@ const NavBar = () => {
         <div className="bg-[rgba(8,8,14,0.97)] backdrop-blur-2xl border-t border-[rgba(212,175,55,0.12)] px-6 pt-4 pb-6 flex flex-col gap-[2px] md:hidden">
           {user ? (
             <>
-              {[
-                { to: "/", l: "Home" },
-                { to: "/products", l: "Products" },
-                { to: "/cart", l: "Cart" },
-              ].map(({ to, l }) => (
+              {/* Render dynamic links in mobile menu */}
+              {navLinks.map(({ to, l }) => (
                 <Link
                   key={l}
                   to={to}
@@ -196,6 +201,13 @@ const NavBar = () => {
                   {l}
                 </Link>
               ))}
+              {/* Separate Mobile-only Cart link if not in navLinks */}
+              <Link
+                to="/cart"
+                className="no-underline px-[14px] py-[12px] text-[#F5F0E8] text-[15px] rounded-[10px] font-['DM_Sans',system-ui,sans-serif] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+              >
+                Cart
+              </Link>
               <button
                 onClick={handleLogout}
                 className="px-[14px] py-[12px] text-left text-[#D4AF37] text-[15px] rounded-[10px] font-['DM_Sans',system-ui,sans-serif] hover:bg-[rgba(212,175,55,0.1)] transition-colors"
@@ -205,12 +217,7 @@ const NavBar = () => {
             </>
           ) : (
             <>
-              {[
-                { to: "/", l: "Home" },
-                { to: "/products", l: "Products" },
-                { to: "/signin", l: "Sign In" },
-                { to: "/signup", l: "Get Started" },
-              ].map(({ to, l }) => (
+              {navLinks.map(({ to, l }) => (
                 <Link
                   key={l}
                   to={to}
@@ -219,6 +226,18 @@ const NavBar = () => {
                   {l}
                 </Link>
               ))}
+              <Link
+                to="/signin"
+                className="no-underline px-[14px] py-[12px] text-[#F5F0E8] text-[15px] rounded-[10px] font-['DM_Sans',system-ui,sans-serif] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/signup"
+                className="no-underline px-[14px] py-[12px] text-[#F5F0E8] text-[15px] rounded-[10px] font-['DM_Sans',system-ui,sans-serif] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+              >
+                Get Started
+              </Link>
             </>
           )}
         </div>

@@ -15,11 +15,19 @@ const getAddresses = async (userId) => {
   return addresses;
 };
 
-const createAddress = async ({ userId, body }) => {
+const createAddress = async ({
+  userId,
+  body,
+  name,
+  phone,
+  pincode,
+  city,
+  state,
+  addressLine,
+}) => {
   if (!userId) {
     throw new ApiError(400, "Invalid user");
   }
-  const { name, phone, pincode, city, state, addressLine } = body;
 
   if (!name || !phone || !pincode || !city || !state || !addressLine) {
     throw new ApiError(400, "All fields are necessary to be filled");
@@ -59,18 +67,26 @@ const deleteAddress = async ({ addressId, userId }) => {
   return address;
 };
 
-const updateAddress = async ({ addressId, userId, body }) => {
+const updateAddress = async ({
+  addressId,
+  userId,
+  name,
+  phone,
+  pincode,
+  city,
+  state,
+  addressLine,
+}) => {
   if (!addressId && !userId) {
     throw new ApiError(400, "Address and user both Ids are needed");
   }
   if (!mongoose.Types.ObjectId.isValid(addressId)) {
     throw new ApiError(400, "Invalid address ID");
   }
-  const { name, phone, pincode, city, state, addressLine } = body;
   if (!name || !phone || !pincode || !city || !state || !addressLine) {
     throw new ApiError(400, "Please provide at least a field to update");
   }
-  const address = await Address.findById({ _id: addressId });
+  const address = await Address.findById(addressId);
 
   if (!address) {
     throw new ApiError(404, "Address Not Found");
@@ -78,21 +94,21 @@ const updateAddress = async ({ addressId, userId, body }) => {
   if (address.userId.toString() !== userId.toString()) {
     throw new ApiError(400, "You are not owner of this address");
   }
-    const updatedAddress = await Address.findById(
-      { _id: addressId },
-      {
-        name,
-        phone,
-        pincode,
-        city,
-        state,
-        addressLine,
-        },
-        {
-            new: true,
-            runValidators:true
-      }
-    );
+  const updatedAddress = await Address.findByIdAndUpdate(
+    addressId,
+    {
+      name,
+      phone,
+      pincode,
+      city,
+      state,
+      addressLine,
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
 
   return updatedAddress;
 };

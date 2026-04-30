@@ -9,6 +9,8 @@ import SingleProductPage from "../features/products/pages/SingleProductPage";
 import ProtectedRoute from "../routes/ProtectedRoute";
 import CartPage from "../features/cart/pages/CartPage";
 import ProfilePage from "../features/profile/pages/ProfilePage";
+import RoleRoute from "./RoleRoute";
+import SellerPage from "../features/seller/pages/SellerPage";
 const AppRoutes = () => {
   return (
     <>
@@ -21,6 +23,9 @@ const AppRoutes = () => {
         <Route element={<ProtectedRoute />}>
           <Route path="/cart" element={<CartPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route element={<RoleRoute roles={["seller"]} />}>
+            <Route path="/seller" element={<SellerPage/>}/>
+          </Route>
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

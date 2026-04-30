@@ -4,10 +4,9 @@ import { clearError, loginUser } from "../authSlice.js";
 import { useNavigate } from "react-router-dom";
 import { Input } from "../../../components/Input.jsx";
 
-
 const LoginForm = () => {
   const dispatch = useDispatch();
-  const navigate=useNavigate()
+  const navigate = useNavigate();
   const { loading, error } = useSelector((state) => state.auth);
   const [formData, setFormData] = useState({
     email: "",
@@ -20,17 +19,12 @@ const LoginForm = () => {
     dispatch(clearError());
   }, [dispatch]);
 
-
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    const result=dispatch(loginUser(formData));
+    const result = dispatch(loginUser(formData));
     if (loginUser.fulfilled.match(result)) {
-
-        navigate("/");
-
+      navigate("/");
     }
-
   };
 
   const handleChange = (e) =>

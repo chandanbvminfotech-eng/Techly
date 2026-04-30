@@ -25,7 +25,7 @@ export const updateUserProfile = createAsyncThunk(
           "Content-Type": "multipart/form-data",
         },
       });
-      console.log(data);
+      // console.log(data);
       return data.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -73,7 +73,7 @@ const profileSlice = createSlice({
       })
       .addCase(updateUserProfile.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload; // Full user object with new avatar
+        state.user = action.payload; 
       })
       .addCase(updateUserProfile.rejected, (state, action) => {
         state.loading = false;

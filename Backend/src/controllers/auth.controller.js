@@ -78,7 +78,7 @@ const getMe = asyncHandler(async (req, res) => {
     "-password -refreshToken",
   );
   if (!user) {
-    throw new ApiError(401, "Not Loggeed In");
+    throw new ApiError(401, "Not Logged In");
   }
   return res
     .status(200)

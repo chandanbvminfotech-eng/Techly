@@ -67,6 +67,7 @@ const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.user = null;
+      state.isInitialized = false;
     },
     clearError: (state) => {
       state.error = null;
@@ -123,7 +124,6 @@ const authSlice = createSlice({
       })
       .addCase(getMe.rejected, (state, action) => {
         state.loading = false;
-        state.user = null;
         state.isInitialized = true;
       });
   },

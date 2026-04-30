@@ -14,11 +14,17 @@ const viewAddresses = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, { result }, "Addresses Fetched successfully"));
 });
 
-const addAddress = asyncHandler(async (req, res) => {   
+const addAddress = asyncHandler(async (req, res) => {  
+  const { name, phone, pincode, city, state, addressLine } = req.body;
   const result = await createAddress({
     userId: req.user._id,
     role: req.role,
-    body: req.body,
+    name,
+    phone,
+    pincode,
+    city,
+    state,
+    addressLine,
   });
   return res
     .status(200)
@@ -35,10 +41,16 @@ const deleteAddressController = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, result, "address deleted successfully"));
 });
 const updateAddressController = asyncHandler(async (req, res) => {
+  const { name, phone, pincode, city, state, addressLine } = req.body;
   const result = await updateAddress({
     addressId: req.params.id,
     userId: req.user._id,
-    body: req.body,
+    name,
+    phone,
+    pincode,
+    city,
+    state,
+    addressLine,
   });
   return res
     .status(200)
