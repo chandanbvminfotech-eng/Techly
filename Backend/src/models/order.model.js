@@ -14,40 +14,44 @@ const addressSnapshotSchema = new mongoose.Schema(
   { _id: false },
 );
 
-const orderSchema = new Schema({
-  buyerId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+const orderSchema = new Schema(
+  {
+    buyerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    totalAmount: {
+      type: Number,
+      required: true,
+    },
+    address: {
+      type: addressSnapshotSchema,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["pending", "confirmed", "cancelled"],
+      required: true,
+      default: "pending",
+    },
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "paid", "failed"],
+      default: "pending",
+    },
+    paymentMethod: {
+      type: String,
+      enum: ["cod", "online"],
+      required: true,
+    },
   },
-  totalAmount: {
-    type: Number,
-    required: true,
-  },
-  address: {
-    type: addressSnapshotSchema,
-    required: true,
-  },
-  status: {
-    type: String,
-    enum: ["pending", "confirmed", "cancelled"],
-    required: true,
-    default: "pending",
-  },
-  paymentStatus: {
-    type: String,
-    enum: ["pending", "paid", "failed"],
-    default: "pending",
-  },
-  paymentMethod: {
-    type: String,
-    enum: ["cod", "online"],
-    required: true,
-  },
-});
+  { timestamps: true },
+);
 
 orderSchema.index({ buyerId: 1 });
 orderSchema.index({ status: 1 });
 orderSchema.index({ createdAt: -1 });
 
-export const Order = model("Order", orderSchema);
+const Order = model("Order", orderSchema);
+export default Order;

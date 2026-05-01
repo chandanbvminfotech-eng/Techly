@@ -21,7 +21,7 @@ api.interceptors.response.use(
         await api.post("/auth/refresh-token");
         return api(originalRequest);
       } catch (refreshError) {
-        console.log("refresh failed:", refreshError.response?.status);
+        // console.log("refresh failed:", refreshError.response?.status);
         const { store } = await import("../store/store.js");
         const { logout } = await import("../features/auth/authSlice.js");
         store.dispatch(logout());

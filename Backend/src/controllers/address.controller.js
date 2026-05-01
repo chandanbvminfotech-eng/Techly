@@ -15,7 +15,7 @@ const viewAddresses = asyncHandler(async (req, res) => {
 });
 
 const addAddress = asyncHandler(async (req, res) => {  
-  const { name, phone, pincode, city, state, addressLine } = req.body;
+  const { name, phone, pincode, city, state, addressLine,isDefault } = req.body;
   const result = await createAddress({
     userId: req.user._id,
     role: req.role,
@@ -25,6 +25,7 @@ const addAddress = asyncHandler(async (req, res) => {
     city,
     state,
     addressLine,
+    isDefault
   });
   return res
     .status(200)
@@ -40,8 +41,10 @@ const deleteAddressController = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, result, "address deleted successfully"));
 });
+
 const updateAddressController = asyncHandler(async (req, res) => {
-  const { name, phone, pincode, city, state, addressLine } = req.body;
+  const { name, phone, pincode, city, state, addressLine, isDefault } =
+    req.body;
   const result = await updateAddress({
     addressId: req.params.id,
     userId: req.user._id,
@@ -51,6 +54,7 @@ const updateAddressController = asyncHandler(async (req, res) => {
     city,
     state,
     addressLine,
+    isDefault,
   });
   return res
     .status(200)

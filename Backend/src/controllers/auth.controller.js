@@ -37,7 +37,6 @@ const loginUser = asyncHandler(async (req, res) => {
 
 // SignOut
 const logoutUser = asyncHandler(async (req, res) => {
-  console.log("Cookies");
   await signOut(req.user);
 
   const options = {

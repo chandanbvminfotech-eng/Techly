@@ -6,7 +6,7 @@ export const fetchAddresses = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const { data } = await api.get("/addresses");
-      console.log(data.data?.result);
+      // console.log(data.data?.result);
       return data.data?.result;
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -97,17 +97,17 @@ const addressSlice = createSlice({
         state.error = action.payload;
       })
       .addCase(deleteAddress.pending, (state) => {
-        state.isLoading = true;
+        state.loading = true;
         state.error = null;
       })
       .addCase(deleteAddress.fulfilled, (state, action) => {
-        state.isLoading = false;
+        state.loading = false;
         state.addresses = state.addresses.filter(
           (address) => address._id !== action.payload,
         );
       })
       .addCase(deleteAddress.rejected, (state, action) => {
-        state.isLoading = false;
+        state.loading = false;
         state.error = action.payload;
       })
       .addCase(updateAddress.pending, (state) => {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Input } from "../../../components/Input";
 import { useDispatch } from "react-redux";
-import { createAddress, updateAddress } from "../addressSlice.js";
+import { createAddress, fetchAddresses, updateAddress } from "../addressSlice.js";
 
 const AddressForm = ({ onSuccess, onCancel, initialData = null }) => {
   const dispatch = useDispatch();
@@ -42,7 +42,6 @@ const AddressForm = ({ onSuccess, onCancel, initialData = null }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (isEditMode) {
       await dispatch(
         updateAddress({
@@ -50,10 +49,11 @@ const AddressForm = ({ onSuccess, onCancel, initialData = null }) => {
           formData, 
         }),
       );
+      dispatch(fetchAddresses());
     } else {
       await dispatch(createAddress(formData));
+      dispatch(fetchAddresses());
     }
-
     onSuccess?.();
   };
 

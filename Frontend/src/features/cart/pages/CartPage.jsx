@@ -96,7 +96,7 @@ const CartPage = () => {
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-4 md:gap-8 w-full sm:w-auto">
-                    {!(quantityCheck()) && (
+                    {!quantityCheck() && (
                       <button
                         className="group relative overflow-hidden bg-[#27161B] px-8 py-4 rounded-full transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(212,175,55,0.2)] active:scale-95"
                         onClick={handleClearCart}
@@ -108,7 +108,10 @@ const CartPage = () => {
                       </button>
                     )}
 
-                    <button className="group relative overflow-hidden bg-[#D4AF37] px-8 py-4 rounded-full transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(212,175,55,0.2)] active:scale-95">
+                    <button
+                      className="group relative overflow-hidden bg-[#D4AF37] px-8 py-4 rounded-full transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(212,175,55,0.2)] active:scale-95"
+                      onClick={() => navigate("/checkout")}
+                    >
                       <span className="relative z-10 text-[#08080E] text-xs md:text-sm font-black uppercase tracking-[0.2em]">
                         Proceed To Checkout
                       </span>

@@ -8,12 +8,12 @@ import Modal from "../../../components/Modal";
 
 const Address = () => {
   const dispatch = useDispatch();
-  const { addresses, loading } = useSelector((state) => state.address);
+  const { addresses, loading ,error} = useSelector((state) => state.address);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
 
   useEffect(() => {
-    dispatch(fetchAddresses());
+      dispatch(fetchAddresses());
   }, [dispatch]);
 
   const handleOpenCreate = () => {
@@ -115,6 +115,11 @@ const Address = () => {
           onCancel={() => setIsModalOpen(false)}
         />
       </Modal>
+      {error && (
+        <div className="w-1/4 px-4 py-3 rounded-[10px] mb-5 mt-5 bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.25)] text-[14px] text-[#fca5a5] font-['DM_Sans',system-ui,sans-serif]">
+          {error}
+        </div>
+      )}
     </div>
   );
 };

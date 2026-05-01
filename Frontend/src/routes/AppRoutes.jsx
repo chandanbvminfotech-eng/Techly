@@ -11,6 +11,9 @@ import CartPage from "../features/cart/pages/CartPage";
 import ProfilePage from "../features/profile/pages/ProfilePage";
 import RoleRoute from "./RoleRoute";
 import SellerPage from "../features/seller/pages/SellerPage";
+import CheckoutPage from "../features/orders/pages/CheckoutPage";
+import OrdersPage from "../features/orders/pages/OrdersPage";
+import OrderDetailPage from "../features/orders/pages/OrderDetailPage";
 const AppRoutes = () => {
   return (
     <>
@@ -23,8 +26,12 @@ const AppRoutes = () => {
         <Route element={<ProtectedRoute />}>
           <Route path="/cart" element={<CartPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/orders" element={<OrdersPage />} />
+          <Route path="/orders/:id" element={<OrderDetailPage />} />
+
           <Route element={<RoleRoute roles={["seller"]} />}>
-            <Route path="/seller" element={<SellerPage/>}/>
+            <Route path="/seller" element={<SellerPage />} />
           </Route>
         </Route>
         <Route path="*" element={<NotFound />} />

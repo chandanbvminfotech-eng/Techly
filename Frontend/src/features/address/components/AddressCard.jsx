@@ -30,7 +30,7 @@ const AddressCard = ({ address,onEdit }) => {
             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#08080E]"></span>
           </span>
           <span className="text-[#08080E] text-[9px] font-black uppercase tracking-[0.2em]">
-            Primary Dispatch
+            Default Address
           </span>
         </div>
       )}

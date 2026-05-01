@@ -43,4 +43,5 @@ orderItemSchema.virtual("totalPrice").get(function () {
 orderItemSchema.set("toJSON", { virtuals: true });
 orderItemSchema.set("toObject", { virtuals: true });
 
-export const OrderItem = model("OrderItem", orderItemSchema);
+const OrderItem = model("OrderItem", orderItemSchema);
+export default OrderItem
