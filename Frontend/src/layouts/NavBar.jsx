@@ -36,7 +36,7 @@ const NavBar = () => {
 
   // Add Dashboard link ONLY if user is a seller
   if (user?.role === "seller") {
-    navLinks.push({ to: "/seller", l: "Dashboard" });
+    navLinks.push({ to: "/seller/dashboard", l: "Dashboard" });
   }
 
   return (

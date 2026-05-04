@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { deleteProduct } from "../sellerSlice";
 
 const SellerProductCard = ({ product }) => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const SellerProductCard = ({ product }) => {
         `Revoke listing for "${product.name}"? This cannot be undone.`,
       )
     ) {
-      // dispatch(deleteProduct(product._id));
+      dispatch(deleteProduct(product._id));
     }
   };
 

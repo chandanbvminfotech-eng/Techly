@@ -7,12 +7,9 @@ export const getSellerProducts = createAsyncThunk(
     try {
       const queryString = new URLSearchParams(queryParams).toString();
       const result = await api.get(`/seller/products?${queryString}`);
-      console.log("Seller products fetched:", result?.data);
       return result?.data;
     } catch (error) {
-      return thunkAPI.rejectWithValue(
-        error.response?.data?.message || "Failed to fetch seller products",
-      );
+      return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to fetch seller products");
     }
   },
 );
@@ -24,9 +21,7 @@ export const addProduct = createAsyncThunk(
       const result = await api.post("/products", formData);
       return result?.data;
     } catch (error) {
-      return thunkAPI.rejectWithValue(
-        error.response?.data?.message || "Failed to add product",
-      );
+      return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to add product");
     }
   },
 );
@@ -35,12 +30,58 @@ export const deleteProduct = createAsyncThunk(
   "seller/deleteProduct",
   async (productId, thunkAPI) => {
     try {
-      const result = await api.delete(`/products/${productId}`);
+      await api.delete(`/products/${productId}`);
       return productId;
     } catch (error) {
-      return thunkAPI.rejectWithValue(
-        error.response?.data?.message || "Failed to add product",
-      );
+      return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to delete product");
+    }
+  },
+);
+
+export const updateProduct = createAsyncThunk(
+  "seller/updateProduct",
+  async ({ productId, formData }, thunkAPI) => {
+    try {
+      const result = await api.put(`/products/${productId}`, formData);
+      return result?.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to update product");
+    }
+  },
+);
+
+export const getSellerOrders = createAsyncThunk(
+  "seller/getSellerOrders",
+  async (_, thunkAPI) => {
+    try {
+      const result = await api.get("/seller/orders");
+      return result?.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to fetch orders");
+    }
+  },
+);
+
+export const updateOrderStatus = createAsyncThunk(
+  "seller/updateOrderStatus",
+  async ({ orderId, status }, thunkAPI) => {
+    try {
+      const result = await api.put(`/seller/orders/${orderId}/status`, { status });
+      return result?.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to update order status");
+    }
+  },
+);
+
+export const getSellerStats = createAsyncThunk(
+  "seller/getSellerStats",
+  async (_, thunkAPI) => {
+    try {
+      const result = await api.get("/seller/stats");
+      return result?.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to fetch stats");
     }
   },
 );
@@ -48,58 +89,81 @@ export const deleteProduct = createAsyncThunk(
 const sellerSlice = createSlice({
   name: "seller",
   initialState: {
-    products: [],
+    products: {},
     orders: [],
+    stats: null,
     error: null,
     loading: false,
   },
   reducers: {
-    clearError: (state) => {
-      state.error = null;
-    },
+    clearError: (state) => { state.error = null; },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getSellerProducts.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      // getSellerProducts
+      .addCase(getSellerProducts.pending, (state) => { state.loading = true; state.error = null; })
       .addCase(getSellerProducts.fulfilled, (state, action) => {
         state.loading = false;
         state.products = action.payload;
       })
-      .addCase(getSellerProducts.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      .addCase(addProduct.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(getSellerProducts.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+
+      // addProduct
+      .addCase(addProduct.pending, (state) => { state.loading = true; state.error = null; })
       .addCase(addProduct.fulfilled, (state, action) => {
         state.loading = false;
-        state.products.products = [
-          ...(state.products.products || []),
-          action.payload,
-        ];
+        state.products.data = state.products.data || { products: [] };
+        state.products.data.products = [...(state.products.data.products || []), action.payload.data];
       })
-      .addCase(addProduct.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      .addCase(deleteProduct.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(addProduct.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+
+      // deleteProduct
+      .addCase(deleteProduct.pending, (state) => { state.loading = true; state.error = null; })
       .addCase(deleteProduct.fulfilled, (state, action) => {
-        state.products.products = state.products.products.filter(
-          (p) => p._id !== action.payload,
-        );
-      })
-      .addCase(deleteProduct.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
-      });
+        if (state.products.data?.products) {
+          state.products.data.products = state.products.data.products.filter(p => p._id !== action.payload);
+        }
+      })
+      .addCase(deleteProduct.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+
+      // updateProduct
+      .addCase(updateProduct.pending, (state) => { state.loading = true; state.error = null; })
+      .addCase(updateProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        if (state.products.data?.products) {
+          const index = state.products.data.products.findIndex(p => p._id === action.payload.data._id);
+          if (index !== -1) state.products.data.products[index] = action.payload.data;
+        }
+      })
+      .addCase(updateProduct.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+
+      // getSellerOrders
+      .addCase(getSellerOrders.pending, (state) => { state.loading = true; state.error = null; })
+      .addCase(getSellerOrders.fulfilled, (state, action) => {
+        state.loading = false;
+        state.orders = action.payload;
+      })
+      .addCase(getSellerOrders.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+
+      // updateOrderStatus
+      .addCase(updateOrderStatus.pending, (state) => { state.loading = true; state.error = null; })
+      .addCase(updateOrderStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        if (state.orders.data) {
+          const index = state.orders.data.findIndex(o => o.orderId?._id === action.payload.data._id);
+          if (index !== -1) state.orders.data[index].orderId.status = action.payload.data.status;
+        }
+      })
+      .addCase(updateOrderStatus.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+
+      // getSellerStats
+      .addCase(getSellerStats.pending, (state) => { state.loading = true; state.error = null; })
+      .addCase(getSellerStats.fulfilled, (state, action) => {
+        state.loading = false;
+        state.stats = action.payload;
+      })
+      .addCase(getSellerStats.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
   },
 });
 
