@@ -47,7 +47,6 @@ const productSchema = new Schema(
 productSchema.index({ brand: 1 });
 productSchema.index({ isPublished: 1 });
 productSchema.index({ sellerId: 1 });
-productSchema.index({ name: "text", brand: "text", description: "text" }); // full-text search
 
 const Product = model("Product", productSchema);
 export default Product;

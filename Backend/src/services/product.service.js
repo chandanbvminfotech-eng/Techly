@@ -130,7 +130,13 @@ const getProducts = async (query) => {
   const filter = {
     isPublished: true,
   };
-  if (search) filter.$text = { $search: search };
+  if (search) {
+    filter.$or = [
+      { name: { $regex: search, $options: "i" } },
+      { brand: { $regex: search, $options: "i" } },
+      { description: { $regex: search, $options: "i" } },
+    ];
+  }
   if (brand) filter.brand = brand;
   if (ram) filter.ram = ram;
   if (storage) filter.storage = storage;
@@ -166,9 +172,6 @@ const getProducts = async (query) => {
       .limit(limit),
     Product.countDocuments(filter),
   ]);
-  if (!products.length) {
-    throw new ApiError(400, "Empty Product details");
-  }
 
   return {
     products,

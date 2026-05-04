@@ -15,6 +15,7 @@ import cartReducer from "../features/cart/cartSlice.js";
 import profileReducer from "../features/profile/profileSlice.js";
 import addressReducer from "../features/address/addressSlice.js";
 import orderReducer from "../features/orders/orderSlice.js";
+import sellerReducer from "../features/seller/sellerSlice.js";
 
 const storage = {
   getItem: (key) => Promise.resolve(window.localStorage.getItem(key)),
@@ -39,6 +40,7 @@ export const store = configureStore({
     profile: profileReducer,
     address: addressReducer,
     order: orderReducer,
+    seller: sellerReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

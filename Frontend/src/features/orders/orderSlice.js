@@ -1,14 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../../api/axios";
 
-const API_URL = "/api/orders";
+const API_URL = "/orders";
 
 // Place Order
 export const placeOrder = createAsyncThunk(
   "order/placeOrder",
   async (orderData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(API_URL, orderData);
+      const response = await api.post(API_URL, orderData);
+      // console.log(response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -21,7 +22,7 @@ export const fetchOrders = createAsyncThunk(
   "order/fetchOrders",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(API_URL);
+      const response = await api.get(API_URL);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -34,7 +35,8 @@ export const fetchOrderById = createAsyncThunk(
   "order/fetchOrderById",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/${id}`);
+      const response = await api.get(`${API_URL}/${id}`);
+      // console.log(response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -47,7 +49,7 @@ export const cancelOrder = createAsyncThunk(
   "order/cancelOrder",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.patch(`${API_URL}/${id}/cancel`);
+      const response = await api.put(`${API_URL}/${id}/cancel`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -94,7 +96,8 @@ const orderSlice = createSlice({
       })
       .addCase(fetchOrders.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.orders = action.payload;
+        state.orders = action.payload.data.orders;
+        state.orderItems = action.payload.data.items;
       })
       .addCase(fetchOrders.rejected, (state, action) => {
         state.isLoading = false;
@@ -108,7 +111,10 @@ const orderSlice = createSlice({
       })
       .addCase(fetchOrderById.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.currentOrder = action.payload;
+        state.currentOrder = {
+          ...action.payload.data.order,
+          items: action.payload.data.items,
+        };
       })
       .addCase(fetchOrderById.rejected, (state, action) => {
         state.isLoading = false;

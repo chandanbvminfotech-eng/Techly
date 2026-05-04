@@ -31,7 +31,7 @@ const NavBar = () => {
   const navLinks = [
     { to: "/", l: "Home" },
     { to: "/products", l: "Products" },
-    { to: "#trending", l: "Trending" },
+    { to: "/orders", l: "Orders" },
   ];
 
   // Add Dashboard link ONLY if user is a seller

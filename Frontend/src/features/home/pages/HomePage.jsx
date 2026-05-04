@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import ProductPage from "../../products/pages/ProductPage";
+import ProductGrid from "../../products/components/ProductGrid";
 
 /* ── tiny animated counter ───────────────────────────── */
 const Counter = ({ target, suffix = "" }) => {
@@ -360,7 +361,7 @@ const HomePage = () => {
       </section>
 
       {/* ═══ TRENDING PRODUCTS ══════════════════════════ */}    
-      <ProductPage/>
+      <ProductGrid/>
 
       {/* ═══ TESTIMONIAL ════════════════════════════════ */}
       <section className="mx-8 mb-[100px] rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-[#D4AF37]/10 to-indigo-500/5 py-20 px-12 text-center">

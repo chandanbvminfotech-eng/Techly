@@ -14,6 +14,9 @@ import SellerPage from "../features/seller/pages/SellerPage";
 import CheckoutPage from "../features/orders/pages/CheckoutPage";
 import OrdersPage from "../features/orders/pages/OrdersPage";
 import OrderDetailPage from "../features/orders/pages/OrderDetailPage";
+import OrderSuccessPage from "../features/orders/pages/OrderSuccessPage";
+import { SellerProductsPage } from "../features/seller/pages/SellerProductsPage";
+import SellerAddProductPage from "../features/seller/pages/SellerAddProductPage";
 const AppRoutes = () => {
   return (
     <>
@@ -29,9 +32,14 @@ const AppRoutes = () => {
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/orders" element={<OrdersPage />} />
           <Route path="/orders/:id" element={<OrderDetailPage />} />
-
+          <Route
+            path="/order-success/:orderId"
+            element={<OrderSuccessPage />}
+          />
           <Route element={<RoleRoute roles={["seller"]} />}>
             <Route path="/seller" element={<SellerPage />} />
+            <Route path="/seller/products" element={<SellerProductsPage />} />
+            <Route path="/seller/products/new" element={<SellerAddProductPage />} />
           </Route>
         </Route>
         <Route path="*" element={<NotFound />} />
