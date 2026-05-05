@@ -22,9 +22,18 @@ productRouter.post(
 
 productRouter.get("/", viewProducts);
 productRouter.get("/:id", viewSingleProduct);
-productRouter.put("/:id", verifyJWT,requireRole("seller","admin"),upload.array("images",5),updateProductController);
-productRouter.delete("/:id", verifyJWT, deleteProductController);
-
-
+productRouter.put(
+  "/:id",
+  verifyJWT,
+  requireRole("seller", "admin"),
+  upload.array("images", 5),
+  updateProductController,
+);
+productRouter.delete(
+  "/:id",
+  verifyJWT,
+  requireRole("seller"),
+  deleteProductController,
+);
 
 export default productRouter;

@@ -7,7 +7,6 @@ import { Link } from "react-router-dom";
 export const SellerProductsPage = () => {
   const dispatch = useDispatch();
   const { products, loading, error } = useSelector((state) => state.seller);
-  console.log(products);
   // Extracting the products array based on your optional chaining logic
   const productList = products?.data?.products || [];
   const pagination = products?.data?.pagination;

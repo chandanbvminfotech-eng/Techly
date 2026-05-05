@@ -21,7 +21,9 @@ const ProductPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const dispatch = useDispatch();
-  const { products, loading, error } = useSelector((state) => state.products);
+  const { products, pagination, loading, error } = useSelector(
+    (state) => state.products,
+  );
   const { cart } = useSelector((state) => state.cart);
   const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
@@ -34,11 +36,21 @@ const ProductPage = () => {
   const activeStorage = params.get("storage") || "";
   const activeMinPrice = params.get("minPrice") || "";
   const activeMaxPrice = params.get("maxPrice") || "";
+  const pageFromUrl = parseInt(params.get("page")) || 1;
+  const [currentPage, setCurrentPage] = useState(pageFromUrl);
 
+  // Update currentPage when URL page param changes
   useEffect(() => {
-    const p = Object.fromEntries(new URLSearchParams(search));
-    dispatch(getProducts({ limit: 12, ...p }));
-  }, [search, dispatch]);
+    setCurrentPage(pageFromUrl);
+  }, [pageFromUrl]);
+
+  // Fetch products when search params or currentPage changes
+  useEffect(() => {
+    const paramsObj = Object.fromEntries(new URLSearchParams(search));
+    // Remove page from paramsObj to avoid duplication, then add currentPage
+    delete paramsObj.page;
+    dispatch(getProducts({ page: currentPage, limit: 8, ...paramsObj }));
+  }, [search, dispatch, currentPage]);
 
   useEffect(() => {
     const timeout = setTimeout(() => handleSearch(searchTerm), 500);
@@ -49,6 +61,8 @@ const ProductPage = () => {
     const p = new URLSearchParams(search);
     if (value) p.set(key, value);
     else p.delete(key);
+    // Reset to page 1 when filters change
+    p.set("page", 1);
     navigate(`/products?${p.toString()}`);
   };
 
@@ -65,10 +79,17 @@ const ProductPage = () => {
     const p = new URLSearchParams(search);
     if (value) p.set(key, value);
     else p.delete(key);
+    p.set("page", 1);
     navigate(`/products?${p.toString()}`);
   };
 
   const clearAllFilters = () => navigate("/products");
+
+  const handlePageChange = (newPage) => {
+    const p = new URLSearchParams(search);
+    p.set("page", newPage);
+    navigate(`/products?${p.toString()}`);
+  };
 
   const hasActiveFilters =
     activeCategory ||
@@ -349,7 +370,7 @@ const ProductPage = () => {
               </div>
             )}
 
-            {products.length > 0 ? (
+            {products?.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
                 {products.map((product) => (
                   <div
@@ -369,6 +390,30 @@ const ProductPage = () => {
             )}
           </div>
         </div>
+
+        {pagination && pagination.totalPages > 1 && (
+          <div className="flex items-center justify-center gap-4 mt-16">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-6 py-3 rounded-full border border-white/10 text-white/40 text-[10px] uppercase tracking-widest font-black hover:border-[#D4AF37]/30 hover:text-[#D4AF37] transition-all disabled:opacity-20 disabled:hover:border-white/10 disabled:hover:text-white/40"
+            >
+              ← Prev
+            </button>
+
+            <span className="text-[rgba(245,240,232,0.4)] text-[10px] uppercase tracking-[0.3em] font-bold">
+              {currentPage} / {pagination.totalPages}
+            </span>
+
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === pagination.totalPages}
+              className="px-6 py-3 rounded-full border border-white/10 text-white/40 text-[10px] uppercase tracking-widest font-black hover:border-[#D4AF37]/30 hover:text-[#D4AF37] transition-all disabled:opacity-20 disabled:hover:border-white/10 disabled:hover:text-white/40"
+            >
+              Next →
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

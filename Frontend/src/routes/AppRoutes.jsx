@@ -10,13 +10,15 @@ import ProtectedRoute from "../routes/ProtectedRoute";
 import CartPage from "../features/cart/pages/CartPage";
 import ProfilePage from "../features/profile/pages/ProfilePage";
 import RoleRoute from "./RoleRoute";
-import SellerPage from "../features/seller/pages/SellerPage";
 import CheckoutPage from "../features/orders/pages/CheckoutPage";
 import OrdersPage from "../features/orders/pages/OrdersPage";
 import OrderDetailPage from "../features/orders/pages/OrderDetailPage";
 import OrderSuccessPage from "../features/orders/pages/OrderSuccessPage";
 import { SellerProductsPage } from "../features/seller/pages/SellerProductsPage";
 import SellerAddProductPage from "../features/seller/pages/SellerAddProductPage";
+import SellerEditProductPage from "../features/seller/pages/SellerEditProductPage";
+import SellerOrdersPage from "../features/seller/pages/SellerOrdersPage";
+import SellerDashboardPage from "../features/seller/pages/SellerDashboardPage";
 const AppRoutes = () => {
   return (
     <>
@@ -37,9 +39,17 @@ const AppRoutes = () => {
             element={<OrderSuccessPage />}
           />
           <Route element={<RoleRoute roles={["seller"]} />}>
-            <Route path="/seller" element={<SellerPage />} />
+            <Route path="/seller/dashboard" element={<SellerDashboardPage />} />
             <Route path="/seller/products" element={<SellerProductsPage />} />
-            <Route path="/seller/products/new" element={<SellerAddProductPage />} />
+            <Route
+              path="/seller/products/new"
+              element={<SellerAddProductPage />}
+            />
+            <Route
+              path="/seller/products/edit/:id"
+              element={<SellerEditProductPage />}
+            />
+            <Route path="/seller/orders" element={<SellerOrdersPage />} />
           </Route>
         </Route>
         <Route path="*" element={<NotFound />} />

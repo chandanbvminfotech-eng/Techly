@@ -22,9 +22,9 @@ const createProduct = async ({ body, files, userId }) => {
   }
 
   const filesToUpload = files;
-  const folderName = "products"
+  const folderName = "products";
   const uploadmultiple = filesToUpload.map((file) =>
-    uploadOnCloudinary(file.path,folderName),
+    uploadOnCloudinary(file.path, folderName),
   );
   console.log("All images uploaded");
   const results = await Promise.all(uploadmultiple);
@@ -124,7 +124,6 @@ const getProducts = async (query) => {
     sellerId,
   } = query;
 
-
   page = Math.max(1, Number(page) || 1);
   limit = Math.min(20, Math.max(1, Number(limit) || 10));
   const filter = {
@@ -206,7 +205,7 @@ const deleteProduct = async ({ productId, userId, role }) => {
   if (!mongoose.Types.ObjectId.isValid(productId)) {
     throw new ApiError(400, "Invalid product ID");
   }
-
+  console.log("ProductId in Backend service:", productId, userId, role);
   const product = await Product.findById(productId);
 
   if (!product) {
@@ -219,11 +218,10 @@ const deleteProduct = async ({ productId, userId, role }) => {
     throw new ApiError(403, "Not allowed to delete this product");
   }
 
-  if (product.images && product.images.length > 0) {
-    const deletePromises = product.images.map((img) =>
+  if (product?.images && product?.images?.length > 0) {
+    const deletePromises = product?.images?.map((img) =>
       deleteFromCloudinary(img.public_id),
     );
-
     await Promise.all(deletePromises);
   }
 
@@ -301,10 +299,11 @@ const updateProduct = async ({ productId, userId, role, body, files }) => {
     finalImages = imagesToBeKept;
   }
 
-
   if (files && files.length > 0) {
-    const folderName="avatar"
-    const uploadPromises = files.map((file) => uploadOnCloudinary(file.path,folderName));
+    const folderName = "products";
+    const uploadPromises = files.map((file) =>
+      uploadOnCloudinary(file.path, folderName),
+    );
 
     const results = await Promise.all(uploadPromises);
 

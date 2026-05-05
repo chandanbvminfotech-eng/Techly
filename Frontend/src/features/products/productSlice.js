@@ -7,6 +7,7 @@ export const getProducts = createAsyncThunk(
     try {
       const queryString = new URLSearchParams(queryParams).toString();
       const { data } = await api.get(`/products?${queryString}`);
+      // console.log(data.data)
       return data.data; // depends on your backend response
     } catch (error) {
       return thunkAPI.rejectWithValue(

@@ -6,6 +6,7 @@ import addressRouter from "./address.routes.js";
 import cartRouter from "./cart.routes.js";
 import orderRouter from "./orders.routes.js"
 import sellerRouter from "./sellers.routes.js";
+import adminRouter from "./admin.routes.js";
 
 const router = express.Router();
 
@@ -16,5 +17,7 @@ router.use("/cart",cartRouter);
 router.use("/addresses",addressRouter);
 router.use("/orders",orderRouter);
 router.use("/seller",sellerRouter);
+router.use("/seller",sellerRouter);
+router.use("/admin",adminRouter);
 
 export default router;

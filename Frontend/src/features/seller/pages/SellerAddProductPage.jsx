@@ -71,12 +71,6 @@ const SellerAddProductPage = () => {
           </h2>
         </div>
 
-        {error && (
-          <div className="mb-8 p-4 rounded-xl bg-red-500/10 border border-red-500/30">
-            <p className="text-red-400 text-sm text-center">{error}</p>
-          </div>
-        )}
-
         <form onSubmit={handleSubmit}>
           <div className="relative p-[1px] rounded-[24px] bg-gradient-to-b from-white/10 to-transparent">
             <div className="bg-[#0C0C12]/90 backdrop-blur-3xl rounded-[23px] p-8 space-y-8">
@@ -95,7 +89,7 @@ const SellerAddProductPage = () => {
                           : "border border-white/10 text-white/40 hover:border-white/30"
                       }`}
                     >
-                      {t === "phone" ? "📱 Phone" : "💻 Laptop"}
+                      {t === "phone" ? " Phone" : " Laptop"}
                     </button>
                   ))}
                 </div>
@@ -224,7 +218,7 @@ const SellerAddProductPage = () => {
                     />
                   </div>
                   <div>
-                    <label className={labelClass}>Battery (mAh)</label>
+                    <label className={labelClass}>Battery </label>
                     <input
                       name="battery"
                       type="number"
@@ -324,6 +318,11 @@ const SellerAddProductPage = () => {
                 )}
               </div>
 
+              {error && (
+                <div className="mb-8 p-4 rounded-xl bg-red-500/10 border border-red-500/30">
+                  <p className="text-red-400 text-sm text-center">{error}</p>
+                </div>
+              )}
               {/* Submit */}
               <button
                 type="submit"
