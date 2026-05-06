@@ -3,7 +3,7 @@ import app from "./app.js";
 import { connectDB } from "./config/db.js";
 import { PORT } from "./config/index.js";
 
-
+const PORT = process.env.PORT || 3000
 
 const startServer = async () => {
     await connectDB();
