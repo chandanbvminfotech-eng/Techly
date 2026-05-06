@@ -11,7 +11,7 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
   }
   try {
     const decodedToken = jwt.verify(token, JWT_ACCESS_SECRET);
-    const user = await User.findById(decodedToken?._id).select("_id role");
+    const user = await User.findById(decodedToken?._id).select("_id role isVerified");
 
     if (!user) {
       throw new ApiError(401, "Invalid Access Token");

@@ -8,16 +8,6 @@ import {
   JWT_REFRESH_SECRET,
 } from "../config/index.js";
 
-const warehouseAddressSchema = new mongoose.Schema(
-  {
-    line: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    pincode: { type: String, required: true },
-  },
-  { _id: false },
-);
-
 const userSchema = new Schema(
   {
     name: {
@@ -50,27 +40,17 @@ const userSchema = new Schema(
       default: "buyer",
     },
     seller: {
-      storeName: {
-        type: String,
-        default: null,
+      type: {
+        storeName: { type: String, default: null },
+        status: {
+          type: String,
+          enum: ["none", "pending", "approved", "rejected"],
+          default: "none",
+        },
+        storeDescription: { type: String, default: null },
       },
-      status: {
-        type: String,
-        enum: ["none", "pending", "approved", "rejected"],
-        default: "none",
-      },
-      storeDescription: {
-        type: String,
-        default: null,
-      },
-      storeLogo: {
-        type: String,
-        default: null,
-      },
-      warehouseAddress: {
-        type: warehouseAddressSchema,
-        default: null,
-      },
+      default: undefined,
+      required: false,
     },
     avatar: [
       {

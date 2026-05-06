@@ -27,17 +27,16 @@ const NavBar = () => {
 
   useEffect(() => setMenuOpen(false), [location]);
 
-  // Define navigation links based on user role
   const navLinks = [
     { to: "/", l: "Home" },
     { to: "/products", l: "Products" },
     { to: "/orders", l: "Orders" },
   ];
 
-  // Add Dashboard link ONLY if user is a seller
-  if (user?.role === "seller") {
+  if (user?.role === "seller")
     navLinks.push({ to: "/seller/dashboard", l: "Dashboard" });
-  }
+  if (user?.role === "admin")
+    navLinks.push({ to: "/admin/dashboard", l: "Dashboard" });
 
   return (
     <nav
@@ -63,7 +62,7 @@ const NavBar = () => {
           </span>
         </Link>
 
-        {/* Desktop Nav - Conditionality applied via navLinks array */}
+        {/* Desktop Nav */}
         <div className="hidden md:flex gap-1">
           {navLinks.map(({ to, l }) => (
             <Link
@@ -76,32 +75,28 @@ const NavBar = () => {
           ))}
         </div>
 
-        {/* Right side - Auth, Cart, Profile */}
+        {/* Right side */}
         <div className="flex gap-[10px] items-center">
           {user ? (
             <>
               <Link
                 to="/cart"
-                className="no-underline px-[16px] sm:px-[20px] py-[9px] rounded-[10px] border border-[rgba(245,240,232,0.15)] text-[rgba(245,240,232,0.85)] text-sm font-medium font-['DM_Sans',system-ui,sans-serif] hover:text-[#D4AF37] transition-colors"
+                className="no-underline px-[16px] sm:px-[20px] py-[9px] rounded-[10px] border border-[rgba(245,240,232,0.15)] text-[rgba(245,240,232,0.85)] text-sm font-medium hover:text-[#D4AF37] transition-colors"
               >
                 Cart
               </Link>
-
-              <Link to="/profile">
-                <div className="flex items-center gap-2">
-                  <UserAvatar
-                    name={user.name}
-                    avatarLink={user.avatar?.[0]?.url}
-                  />
-                  <span className="text-[#F5F0E8] text-sm font-medium hidden sm:inline">
-                    {user.name}
-                  </span>
-                </div>
+              <Link to="/profile" className="flex items-center gap-2">
+                <UserAvatar
+                  name={user.name}
+                  avatarLink={user.avatar?.[0]?.url}
+                />
+                <span className="text-[#F5F0E8] text-sm font-medium hidden sm:inline">
+                  {user.name}
+                </span>
               </Link>
-
               <button
                 onClick={handleLogout}
-                className="hidden md:block px-[22px] py-[9px] rounded-[10px] border border-[rgba(212,175,55,0.4)] bg-transparent text-[#D4AF37] text-sm font-medium font-['DM_Sans',system-ui,sans-serif] hover:bg-[rgba(212,175,55,0.1)] transition-colors"
+                className="hidden md:block px-[22px] py-[9px] rounded-[10px] border border-[rgba(212,175,55,0.4)] text-[#D4AF37] text-sm font-medium hover:bg-[rgba(212,175,55,0.1)] transition-colors"
               >
                 Sign Out
               </button>
@@ -110,138 +105,112 @@ const NavBar = () => {
             <>
               <Link
                 to="/signin"
-                className="hidden sm:block no-underline px-[20px] py-[9px] rounded-[10px] border border-[rgba(245,240,232,0.15)] text-[rgba(245,240,232,0.85)] text-sm font-medium font-['DM_Sans',system-ui,sans-serif]"
+                className="hidden sm:block no-underline px-[20px] py-[9px] rounded-[10px] border border-[rgba(245,240,232,0.15)] text-[rgba(245,240,232,0.85)] text-sm font-medium"
               >
                 Sign In
               </Link>
               <Link
                 to="/signup"
-                className="hidden sm:block no-underline px-[22px] py-[9px] rounded-[10px] bg-gradient-to-br from-[#D4AF37] to-[#B8941E] text-[#08080E] text-sm font-semibold font-['DM_Sans',system-ui,sans-serif] shadow-[0_0_20px_rgba(212,175,55,0.3)]"
+                className="hidden sm:block no-underline px-[22px] py-[9px] rounded-[10px] bg-gradient-to-br from-[#D4AF37] to-[#B8941E] text-[#08080E] text-sm font-semibold shadow-[0_0_20px_rgba(212,175,55,0.3)]"
               >
                 Get Started
               </Link>
             </>
           )}
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button - Hamburger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden bg-none border-none cursor-pointer text-[#F5F0E8] p-[6px]"
+            className="md:hidden bg-none border-none cursor-pointer text-[#F5F0E8] p-[6px] z-[110]"
           >
             <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
               {menuOpen ? (
-                <>
-                  <line
-                    x1="4"
-                    y1="4"
-                    x2="18"
-                    y2="18"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                  <line
-                    x1="18"
-                    y1="4"
-                    x2="4"
-                    y2="18"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </>
+                <path
+                  d="M4 4L18 18M18 4L4 18"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
               ) : (
-                <>
-                  <line
-                    x1="3"
-                    y1="6"
-                    x2="19"
-                    y2="6"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                  <line
-                    x1="3"
-                    y1="11"
-                    x2="19"
-                    y2="11"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                  <line
-                    x1="3"
-                    y1="16"
-                    x2="19"
-                    y2="16"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </>
+                <path
+                  d="M3 6H19M3 11H19M3 16H19"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
               )}
             </svg>
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      {menuOpen && (
-        <div className="bg-[rgba(8,8,14,0.97)] backdrop-blur-2xl border-t border-[rgba(212,175,55,0.12)] px-6 pt-4 pb-6 flex flex-col gap-[2px] md:hidden">
-          {user ? (
-            <>
-              {/* Render dynamic links in mobile menu */}
-              {navLinks.map(({ to, l }) => (
+      {/* --- MOBILE DRAWER SECTION --- */}
+
+      {/* Overlay: Darkens background when drawer is open */}
+      <div
+        className={`fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${menuOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}
+        onClick={() => setMenuOpen(false)}
+      />
+
+      {/* Drawer Panel */}
+      <div
+        className={`fixed top-0 left-0 h-screen w-[280px] bg-[#08080E] border-r border-[rgba(212,175,55,0.12)] shadow-2xl z-[105] transform transition-transform duration-300 ease-in-out md:hidden ${
+          menuOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex flex-col h-full pt-20 px-6 pb-10">
+          <div className="flex flex-col gap-2">
+            {navLinks.map(({ to, l }) => (
+              <Link
+                key={l}
+                to={to}
+                className="no-underline px-4 py-3 text-[#F5F0E8] text-lg rounded-xl font-medium hover:bg-white/5 transition-colors"
+              >
+                {l}
+              </Link>
+            ))}
+
+            <div className="h-[1px] bg-white/5 my-4" />
+
+            {user ? (
+              <>
                 <Link
-                  key={l}
-                  to={to}
-                  className="no-underline px-[14px] py-[12px] text-[#F5F0E8] text-[15px] rounded-[10px] font-['DM_Sans',system-ui,sans-serif] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+                  to="/cart"
+                  className="no-underline px-4 py-3 text-[#F5F0E8] text-lg rounded-xl hover:bg-white/5 transition-colors"
                 >
-                  {l}
+                  Cart
                 </Link>
-              ))}
-              {/* Separate Mobile-only Cart link if not in navLinks */}
-              <Link
-                to="/cart"
-                className="no-underline px-[14px] py-[12px] text-[#F5F0E8] text-[15px] rounded-[10px] font-['DM_Sans',system-ui,sans-serif] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
-              >
-                Cart
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="px-[14px] py-[12px] text-left text-[#D4AF37] text-[15px] rounded-[10px] font-['DM_Sans',system-ui,sans-serif] hover:bg-[rgba(212,175,55,0.1)] transition-colors"
-              >
-                Sign Out
-              </button>
-            </>
-          ) : (
-            <>
-              {navLinks.map(({ to, l }) => (
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-3 text-left text-[#D4AF37] text-lg rounded-xl font-medium hover:bg-[#D4AF37]/10 transition-colors"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
                 <Link
-                  key={l}
-                  to={to}
-                  className="no-underline px-[14px] py-[12px] text-[#F5F0E8] text-[15px] rounded-[10px] font-['DM_Sans',system-ui,sans-serif] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+                  to="/signin"
+                  className="no-underline px-4 py-3 text-[#F5F0E8] text-lg rounded-xl hover:bg-white/5 transition-colors"
                 >
-                  {l}
+                  Sign In
                 </Link>
-              ))}
-              <Link
-                to="/signin"
-                className="no-underline px-[14px] py-[12px] text-[#F5F0E8] text-[15px] rounded-[10px] font-['DM_Sans',system-ui,sans-serif] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
-              >
-                Sign In
-              </Link>
-              <Link
-                to="/signup"
-                className="no-underline px-[14px] py-[12px] text-[#F5F0E8] text-[15px] rounded-[10px] font-['DM_Sans',system-ui,sans-serif] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
-              >
-                Get Started
-              </Link>
-            </>
-          )}
+                <Link
+                  to="/signup"
+                  className="no-underline px-4 py-3 text-[#D4AF37] text-lg rounded-xl font-semibold"
+                >
+                  Get Started
+                </Link>
+              </>
+            )}
+          </div>
+
+          {/* Decorative Bottom element */}
+          <div className="mt-auto opacity-20 italic font-[Georgia] text-[#D4AF37] text-sm">
+            Techly Luxury Curation
+          </div>
         </div>
-      )}
+      </div>
     </nav>
   );
 };

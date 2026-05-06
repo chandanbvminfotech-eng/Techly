@@ -1,25 +1,43 @@
-import { Router } from 'express';
-import verifyJWT from '../middlewares/auth.middleware.js';
-import requireRole from '../middlewares/requireRole.middleware.js';
-import { getSellerOrderController, getSellerProductsController, getSellerStatsController, updateOrderStatusController } from '../controllers/seller.controller.js';
+import { Router } from "express";
+import verifyJWT from "../middlewares/auth.middleware.js";
+import requireRole from "../middlewares/requireRole.middleware.js";
+import requiredVerifiedSeller from "../middlewares/requireVerifiedSeller.middleware.js";
+import {
+  getSellerOrderController,
+  getSellerProductsController,
+  getSellerStatsController,
+  updateOrderStatusController,
+} from "../controllers/seller.controller.js";
 
 const sellerRouter = Router();
 
-sellerRouter.get("/products",verifyJWT,requireRole("seller"),getSellerProductsController);
 sellerRouter.get(
-    "/orders",
+  "/products",
   verifyJWT,
   requireRole("seller"),
-  getSellerOrderController
+  getSellerProductsController,
+);
+sellerRouter.get(
+  "/orders",
+  verifyJWT,
+  requireRole("seller"),
+
+  getSellerOrderController,
 );
 sellerRouter.put(
-    "/orders/:id/status",
+  "/orders/:id/status",
   verifyJWT,
   requireRole("seller"),
+  requiredVerifiedSeller,
   updateOrderStatusController,
 );
 
-sellerRouter.get("/stats",verifyJWT,requireRole("seller"),getSellerStatsController);
+sellerRouter.get(
+  "/stats",
+  verifyJWT,
+  requireRole("seller"),
 
+  getSellerStatsController,
+);
 
 export default sellerRouter;

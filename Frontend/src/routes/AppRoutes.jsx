@@ -19,6 +19,13 @@ import SellerAddProductPage from "../features/seller/pages/SellerAddProductPage"
 import SellerEditProductPage from "../features/seller/pages/SellerEditProductPage";
 import SellerOrdersPage from "../features/seller/pages/SellerOrdersPage";
 import SellerDashboardPage from "../features/seller/pages/SellerDashboardPage";
+import AdminLayout from "../features/admin/components/AdminLayout";
+import AdminDashboardPage from "../features/admin/pages/AdminDashboard";
+import AdminUsersPage from "../features/admin/pages/AdminUsersPage";
+import AdminPendingSellersPage from "../features/admin/pages/AdminPendingSellersPage";
+import AdminOrdersPage from "../features/admin/pages/AdminOrdersPage";
+import VerifiedSellerRoute from "./VerifiedSellerRoute";
+import SellerApplyPage from "../features/auth/pages/SellerApplyPage";
 const AppRoutes = () => {
   return (
     <>
@@ -38,18 +45,32 @@ const AppRoutes = () => {
             path="/order-success/:orderId"
             element={<OrderSuccessPage />}
           />
+          <Route path="/seller/apply" element={<SellerApplyPage />} />
           <Route element={<RoleRoute roles={["seller"]} />}>
             <Route path="/seller/dashboard" element={<SellerDashboardPage />} />
-            <Route path="/seller/products" element={<SellerProductsPage />} />
-            <Route
-              path="/seller/products/new"
-              element={<SellerAddProductPage />}
-            />
-            <Route
-              path="/seller/products/edit/:id"
-              element={<SellerEditProductPage />}
-            />
             <Route path="/seller/orders" element={<SellerOrdersPage />} />
+            <Route element={<VerifiedSellerRoute />}>
+              <Route path="/seller/products" element={<SellerProductsPage />} />
+              <Route
+                path="/seller/products/new"
+                element={<SellerAddProductPage />}
+              />
+              <Route
+                path="/seller/products/edit/:id"
+                element={<SellerEditProductPage />}
+              />
+            </Route>
+          </Route>
+          <Route element={<RoleRoute roles={["admin"]} />}>
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route path="dashboard" element={<AdminDashboardPage />} />
+              <Route path="users" element={<AdminUsersPage />} />
+              <Route
+                path="sellers/pending"
+                element={<AdminPendingSellersPage />}
+              />
+              <Route path="orders" element={<AdminOrdersPage />} />
+            </Route>
           </Route>
         </Route>
         <Route path="*" element={<NotFound />} />

@@ -95,4 +95,26 @@ try {
 }
 };
 
-export { showUserProfile, updateUserProfile };
+
+const applyForSeller = async ({ userId, storeName, storeDescription }) => {
+  if (!storeName && !storeDescription) {
+    throw new ApiError(400,"Name and description are required to become a seller")
+  }
+  const user = await User.findById(userId);
+  if (!user) throw new ApiError(404, "User not found");
+  if (user.role === "seller") {
+    throw new ApiError(400, "You are already a seller");
+  }
+  user.role = "seller";
+  user.isVerified = false;
+  const seller = {
+    status: "pending",
+    storeName,
+    storeDescription,
+  };
+  user.seller = seller;
+  await user.save();
+  return user;
+};
+
+export { showUserProfile, updateUserProfile,applyForSeller };

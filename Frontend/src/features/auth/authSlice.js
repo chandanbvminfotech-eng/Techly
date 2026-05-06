@@ -55,6 +55,19 @@ export const getMe = createAsyncThunk("auth/getMe", async (_, thunkAPI) => {
   }
 });
 
+export const applyForSeller = createAsyncThunk("auth/applyForSeller",
+  async (formData , thunkAPI) => {
+    try {
+      const data = await api.post("/users/apply-seller", formData);
+      return data.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to apply",
+      );
+    }
+  }
+)
+
 const authSlice = createSlice({
   name: "auth",
   initialState: {
@@ -125,6 +138,18 @@ const authSlice = createSlice({
       .addCase(getMe.rejected, (state, action) => {
         state.loading = false;
         state.isInitialized = true;
+      })
+      .addCase(applyForSeller.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(applyForSeller.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload; // updated user with role:seller
+      })
+      .addCase(applyForSeller.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

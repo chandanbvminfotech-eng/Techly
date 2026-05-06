@@ -72,22 +72,28 @@ const updateOrderStatus = async ({ orderId, status, sellerId }) => {
 
 const getSellerStats = async ({ sellerId }) => {
   if (!sellerId) {
-    throw new ApiError(400,"Seller ID is required");
+    throw new ApiError(400, "Seller ID is required");
   }
   const totalProducts = await Product.countDocuments({ sellerId });
-  console.log("Total Products:", totalProducts);
-  
+  // console.log("Total Products:", totalProducts);
+
   const totalOrders = await OrderItem.countDocuments({ sellerId });
-  console.log("Total Orders:", totalOrders);
+  // console.log("Total Orders:", totalOrders);
 
   const revenue = await OrderItem.aggregate([
     { $match: { sellerId: new mongoose.Types.ObjectId(sellerId) } },
-    {$group:{_id:null,total:{$sum:{$multiply:["$priceAtPurchase","$quantity"]}}}}
-  ])
+    {
+      $group: {
+        _id: null,
+        total: { $sum: { $multiply: ["$priceAtPurchase", "$quantity"] } },
+      },
+    },
+  ]);
   const totalRevenue = revenue[0]?.total || 0;
-  console.log("Total Revenue:", totalRevenue);
+  // console.log("Total Revenue:", totalRevenue);
 
-  return {totalProducts, totalOrders, totalRevenue};
-}
+  return { totalProducts, totalOrders, totalRevenue };
+};
 
-export { getSellerProducts, getSellerOrder, updateOrderStatus,getSellerStats };
+
+export { getSellerProducts, getSellerOrder, updateOrderStatus, getSellerStats };

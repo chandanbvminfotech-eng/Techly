@@ -9,6 +9,7 @@ import {
 import verifyJWT from "../middlewares/auth.middleware.js";
 import requireRole from "../middlewares/requireRole.middleware.js";
 import upload from "../middlewares/multer.middleware.js";
+import requireVerifiedSeller from "../middlewares/requireVerifiedSeller.middleware.js";
 
 const productRouter = Router();
 
@@ -16,6 +17,7 @@ productRouter.post(
   "/",
   verifyJWT,
   requireRole("seller"),
+  requireVerifiedSeller,
   upload.array("images", 5),
   addProduct,
 );
@@ -26,6 +28,7 @@ productRouter.put(
   "/:id",
   verifyJWT,
   requireRole("seller", "admin"),
+  requireVerifiedSeller,
   upload.array("images", 5),
   updateProductController,
 );
@@ -33,6 +36,7 @@ productRouter.delete(
   "/:id",
   verifyJWT,
   requireRole("seller"),
+  requireVerifiedSeller,
   deleteProductController,
 );
 
