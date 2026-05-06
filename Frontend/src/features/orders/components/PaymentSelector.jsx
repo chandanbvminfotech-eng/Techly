@@ -2,25 +2,32 @@ import React from "react";
 
 const PaymentSelector = ({ paymentMethod, onSelectPayment }) => {
   return (
-    <div className="bg-[rgba(255,255,255,0.04)] rounded-xl p-5">
-      <h2 className="text-lg font-semibold text-white mb-4">Payment Method</h2>
+    <div>
+      <h2 className="text-base font-bold mb-4" style={{ color: "var(--text-primary)" }}>Payment Method</h2>
       <div className="space-y-3">
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input
-            type="radio"
-            name="payment"
-            value="cod"
-            checked={paymentMethod === "cod"}
-            onChange={(e) => onSelectPayment(e.target.value)}
-          />
-          <span className="text-white text-sm">Cash on Delivery</span>
+        <label
+          className="flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all"
+          style={{
+            background: paymentMethod === "cod" ? "var(--gold-muted)" : "var(--input-bg)",
+            border: `1px solid ${paymentMethod === "cod" ? "var(--gold)" : "var(--border-subtle)"}`,
+          }}
+        >
+          <input type="radio" name="payment" value="cod" checked={paymentMethod === "cod"} onChange={(e) => onSelectPayment(e.target.value)} className="accent-[#D4AF37]" />
+          <div>
+            <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>Cash on Delivery</p>
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>Pay when your order arrives</p>
+          </div>
         </label>
-        <label className="flex items-center gap-3 cursor-pointer opacity-50">
+        <div
+          className="flex items-center gap-3 p-4 rounded-xl opacity-50"
+          style={{ background: "var(--input-bg)", border: "1px solid var(--border-subtle)" }}
+        >
           <input type="radio" disabled />
-          <span className="text-[rgba(245,240,232,0.4)] text-sm">
-            Online Payment (Coming Soon)
-          </span>
-        </label>
+          <div>
+            <p className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>Online Payment</p>
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>Coming Soon</p>
+          </div>
+        </div>
       </div>
     </div>
   );

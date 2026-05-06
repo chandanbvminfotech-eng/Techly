@@ -1,25 +1,15 @@
 import React from "react";
 
-const LoadingScreen = () => {
-  return (
-    <div className="fixed inset-0 z- flex flex-col items-center justify-center bg-[#0a0a0a]">
-      {/* Background Glow */}
-      <div className="absolute w-[300px] h-[300px] bg-[#D4AF37]/10 blur-[120px] rounded-full" />
-
-      <div className="relative flex flex-col items-center">
-        {/* The Luxury Spinner */}
-        <div className="w-16 h-16 border-2 border-[#D4AF37]/20 border-t-[#D4AF37] rounded-full animate-spin" />
-
-        {/* Branding/Text */}
-        <div className="mt-6 flex flex-col items-center">
-          <h2 className="text-[#D4AF37] text-xl font-light tracking-[0.2em] uppercase animate-pulse">
-            Loading
-          </h2>
-          <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent mt-2" />
-        </div>
-      </div>
+const LoadingScreen = () => (
+  <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center" style={{ background: "var(--bg-base)" }}>
+    <div className="absolute w-[280px] h-[280px] rounded-full blur-[120px]" style={{ background: "var(--gold-muted)" }} />
+    <div className="relative flex flex-col items-center">
+      <div className="w-14 h-14 rounded-full animate-spin" style={{ border: "2px solid var(--border-subtle)", borderTopColor: "var(--gold)" }} />
+      <h2 className="mt-5 text-lg font-light tracking-[0.2em] uppercase animate-pulse" style={{ color: "var(--gold)" }}>
+        Loading
+      </h2>
     </div>
-  );
-};
+  </div>
+);
 
 export default LoadingScreen;

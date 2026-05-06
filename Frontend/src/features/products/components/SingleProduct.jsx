@@ -1,22 +1,12 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  addItemCart,
-  deleteSingleItemCart,
-  updateCartQuantity,
-} from "../../cart/cartSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { ApiError } from "../../../../../Backend/src/utils/apiError";
+import { addItemCart, deleteSingleItemCart, updateCartQuantity } from "../../cart/cartSlice";
+import { useDispatch } from "react-redux";
 
-const SpecRow = ({ icon, label, value }) => (
-  <div className="flex items-center gap-3 py-3 border-b border-[rgba(245,240,232,0.06)] last:border-0 group">
-    <span className="text-[#D4AF37] text-lg w-6 shrink-0">{icon}</span>
-    <span className="text-xs font-semibold tracking-wider text-[rgba(245,240,232,0.5)] uppercase w-24">
-      {label}
-    </span>
-    <span className="text-sm text-[rgba(245,240,232,0.85)] font-medium ml-auto text-right">
-      {value}
-    </span>
+const SpecRow = ({ label, value }) => (
+  <div className="flex items-center gap-3 py-3 last:border-0" style={{ borderBottom: "1px solid var(--border-subtle)" }}>
+    <span className="text-xs font-bold tracking-wider uppercase w-24" style={{ color: "var(--text-muted)" }}>{label}</span>
+    <span className="text-sm font-semibold ml-auto text-right" style={{ color: "var(--text-primary)" }}>{value}</span>
   </div>
 );
 
@@ -24,21 +14,12 @@ const StockBadge = ({ stock }) => {
   const low = stock <= 5;
   const out = stock === 0;
   return (
-    <span
-      className={`inline-flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-full
-        ${
-          out
-            ? "bg-red-500/10 text-red-400 border border-red-500/20"
-            : low
-              ? "bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20"
-              : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-        }`}
-    >
-      <span
-        className={`w-1.5 h-1.5 rounded-full ${
-          out ? "bg-red-400" : low ? "bg-[#D4AF37]" : "bg-emerald-400"
-        }`}
-      />
+    <span className={`inline-flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-full ${
+      out ? "bg-red-500/10 text-red-400 border border-red-500/20"
+          : low ? "bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20"
+               : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+    }`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${out ? "bg-red-400" : low ? "bg-[#D4AF37]" : "bg-emerald-400"}`} />
       {out ? "Out of Stock" : low ? `Only ${stock} left` : "In Stock"}
     </span>
   );
@@ -53,305 +34,191 @@ const SingleProduct = ({ product, cart, user }) => {
   const navigate = useNavigate();
 
   const images = product.images?.length ? product.images : [{ url: "" }];
-  const cartItem = cart?.items?.find(
-    (item) => item.productId.id === product._id,
-  );
-
+  const cartItem = cart?.items?.find((item) => item.productId.id === product._id);
 
   const handleAddToCart = async () => {
     if (!user) {
       localStorage.setItem("redirectAfterLogin", `/products/${product._id}`);
-      navigate("/signin", {
-        state: { from: `/products/${product._id}`, productId: product._id },
-      });
+      navigate("/signin", { state: { from: `/products/${product._id}` } });
       return;
     }
     try {
-      await dispatch(
-        addItemCart({
-          productId: product._id,
-          quantity: quantity,
-        }),
-      );
+      await dispatch(addItemCart({ productId: product._id, quantity }));
       setAdded(true);
       setTimeout(() => setAdded(false), 2200);
-    } catch (err) {
-      throw new ApiError(400, "Error in adding to cart");
-    }
+    } catch {}
   };
 
   const handleAddQuantity = async () => {
-    await dispatch(
-      updateCartQuantity({
-        productId: cartItem.productId._id,
-        quantity: cartItem.quantity + 1,
-      }),
-    );
+    await dispatch(updateCartQuantity({ productId: cartItem.productId._id, quantity: cartItem.quantity + 1 }));
   };
-
   const handleSubtractQuantity = async () => {
     if (cartItem.quantity === 1) {
-      await dispatch(
-        deleteSingleItemCart({ productId: cartItem.productId._id }),
-      );
+      await dispatch(deleteSingleItemCart({ productId: cartItem.productId._id }));
     } else {
-      await dispatch(
-        updateCartQuantity({
-          productId: cartItem.productId._id,
-          quantity: cartItem.quantity - 1,
-        }),
-      );
+      await dispatch(updateCartQuantity({ productId: cartItem.productId._id, quantity: cartItem.quantity - 1 }));
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0C0D11] font-['DM_Sans',system-ui,sans-serif]">
+    <div className="min-h-screen font-['DM_Sans',system-ui,sans-serif]" style={{ background: "var(--bg-base)" }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         {/* Breadcrumb */}
-        <nav className="mb-8 flex items-center gap-2 text-xs text-[rgba(245,240,232,0.5)] font-medium">
-          <Link to="/" className="hover:text-[#D4AF37] transition-colors">
-            Home
-          </Link>
-          <span>›</span>
-          <Link
-            to="/products"
-            className="hover:text-[#D4AF37] transition-colors"
-          >
-            Products
-          </Link>
-          <span>›</span>
-          <span className="text-[rgba(245,240,232,0.72)]">{product.name}</span>
+        <nav className="mb-8 flex items-center gap-2 text-xs font-medium flex-wrap">
+          <Link to="/" className="transition-colors hover:opacity-80" style={{ color: "var(--text-muted)" }}>Home</Link>
+          <span style={{ color: "var(--text-muted)" }}>›</span>
+          <Link to="/products" className="transition-colors hover:opacity-80" style={{ color: "var(--text-muted)" }}>Products</Link>
+          <span style={{ color: "var(--text-muted)" }}>›</span>
+          <span style={{ color: "var(--text-secondary)" }}>{product.name}</span>
         </nav>
 
-        {/* Main Product Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Left Column - Gallery */}
+          {/* Gallery */}
           <div className="space-y-4">
-            {/* Main Image */}
-            <div className="relative group rounded-2xl bg-[rgba(245,240,232,0.02)] border border-[rgba(245,240,232,0.06)] overflow-hidden">
-              <div className="aspect-square flex items-center justify-center p-8">
+            <div className="relative group rounded-2xl overflow-hidden" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)" }}>
+              <div className="aspect-square flex items-center justify-center p-6 sm:p-10">
                 <img
                   src={images[activeImg]?.url}
                   alt={product.name}
                   onLoad={() => setImgLoaded(true)}
-                  className={`max-w-full max-h-full object-contain transition-all duration-500
-                    group-hover:scale-105
-                    ${imgLoaded ? "opacity-100" : "opacity-0"}`}
+                  className={`max-w-full max-h-full object-contain transition-all duration-500 group-hover:scale-105 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
                 />
               </div>
-
-              {/* Image Counter */}
               {images.length > 1 && (
-                <div className="absolute bottom-4 right-4 bg-[#08080E]/80 backdrop-blur-sm px-2 py-1 rounded-lg text-xs text-[rgba(245,240,232,0.72)]">
+                <div className="absolute bottom-4 right-4 px-2 py-1 rounded-lg text-xs font-medium backdrop-blur-sm"
+                  style={{ background: "var(--bg-card)", color: "var(--text-secondary)", border: "1px solid var(--border-subtle)" }}>
                   {activeImg + 1} / {images.length}
                 </div>
               )}
             </div>
-
-            {/* Thumbnails */}
             {images.length > 1 && (
               <div className="flex gap-3 overflow-x-auto pb-2">
                 {images.map((img, i) => (
                   <button
                     key={i}
                     onClick={() => setActiveImg(i)}
-                    className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all
-                      ${
-                        activeImg === i
-                          ? "border-[#D4AF37] shadow-lg shadow-[#D4AF37]/20"
-                          : "border-[rgba(245,240,232,0.1)] hover:border-[rgba(245,240,232,0.3)]"
-                      }`}
+                    className="relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all"
+                    style={{ borderColor: activeImg === i ? "var(--gold)" : "var(--border-subtle)" }}
                   >
-                    <img
-                      src={img.url}
-                      alt={`Product view ${i + 1}`}
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={img.url} alt={`View ${i + 1}`} className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Right Column - Details */}
-          <div className="space-y-6">
-            {/* Brand and Name */}
+          {/* Details */}
+          <div className="space-y-5">
+            {/* Brand + name */}
             <div>
-              <div className="inline-block px-3 py-1 bg-[#D4AF37]/10 rounded-full mb-4">
-                <span className="text-xs font-bold text-[#D4AF37] tracking-wider">
-                  {product.brand}
-                </span>
+              <div className="inline-block px-3 py-1 rounded-full mb-3" style={{ background: "var(--gold-muted)" }}>
+                <span className="text-xs font-bold tracking-wider" style={{ color: "var(--gold)" }}>{product.brand}</span>
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-[#F5F0E8] mb-4 leading-tight">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight mb-3" style={{ color: "var(--text-primary)" }}>
                 {product.name}
               </h1>
-              <div className="flex items-center gap-3 flex-wrap">
-                <StockBadge stock={product.stock} />
-              </div>
+              <StockBadge stock={product.stock} />
             </div>
 
             {/* Price */}
-            <div className="flex items-baseline gap-3 pb-2 border-b border-[rgba(245,240,232,0.06)]">
-              <span className="text-4xl font-bold text-[#F5F0E8]">
+            <div className="flex items-baseline gap-3 pb-4" style={{ borderBottom: "1px solid var(--border-subtle)" }}>
+              <span className="text-3xl md:text-4xl font-bold" style={{ color: "var(--text-primary)" }}>
                 ₹{Number(product.price).toLocaleString("en-IN")}
               </span>
-              <span className="text-base text-[rgba(245,240,232,0.5)] line-through">
-                ₹
-                {(Number(product.price) * 1.12).toLocaleString("en-IN", {
-                  maximumFractionDigits: 0,
-                })}
+              <span className="text-base line-through" style={{ color: "var(--text-muted)" }}>
+                ₹{(Number(product.price) * 1.12).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
               </span>
-              <span className="text-sm font-semibold text-[#D4AF37] bg-[#D4AF37]/10 px-2 py-1 rounded">
+              <span className="text-xs font-bold px-2 py-1 rounded" style={{ color: "var(--gold)", background: "var(--gold-muted)" }}>
                 12% OFF
               </span>
             </div>
 
             {/* Description */}
-            <div className="bg-[rgba(245,240,232,0.03)] rounded-xl p-4 border border-[rgba(245,240,232,0.06)]">
-              <p className="text-sm text-[rgba(245,240,232,0.72)] leading-relaxed">
-                {product.description}
-              </p>
+            <div className="rounded-xl p-4" style={{ background: "var(--input-bg)", border: "1px solid var(--border-subtle)" }}>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>{product.description}</p>
             </div>
 
-            {/* Specifications */}
-            <div className="space-y-2">
-              <h3 className="text-xs font-semibold text-[#D4AF37] tracking-wider">
-                SPECIFICATIONS
-              </h3>
-              <div className="bg-[rgba(245,240,232,0.02)] rounded-xl border border-[rgba(245,240,232,0.06)] overflow-hidden">
-                <div className="p-4 space-y-1">
-                  {product.ram && <SpecRow label="RAM" value={product.ram} />}
-                  {product.storage && (
-                    <SpecRow label="Storage" value={product.storage} />
-                  )}
-                  {product.processor && (
-                    <SpecRow label="Processor" value={product.processor} />
-                  )}
-                  {product.battery && (
-                    <SpecRow label="Battery" value={`${product.battery} mAh`} />
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Quantity Selector */}
-            {!cartItem && (
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-[rgba(245,240,232,0.72)]">
-                  Quantity:
-                </span>
-                <div className="flex items-center gap-2 bg-[rgba(245,240,232,0.05)] rounded-lg border border-[rgba(245,240,232,0.1)]">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="w-8 h-8 flex items-center justify-center hover:bg-[rgba(245,240,232,0.1)] rounded-l-lg transition"
-                  >
-                    -
-                  </button>
-                  <span className="w-12 text-center text-sm font-medium text-[#F5F0E8]">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={() =>
-                      setQuantity(Math.min(product.stock, quantity + 1))
-                    }
-                    className="w-8 h-8 flex items-center justify-center hover:bg-[rgba(245,240,232,0.1)] rounded-r-lg transition"
-                  >
-                    +
-                  </button>
+            {/* Specs */}
+            {(product.ram || product.storage || product.processor || product.battery) && (
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "var(--gold)" }}>Specifications</h3>
+                <div className="rounded-xl overflow-hidden" style={{ background: "var(--input-bg)", border: "1px solid var(--border-subtle)" }}>
+                  <div className="p-3">
+                    {product.ram && <SpecRow label="RAM" value={product.ram} />}
+                    {product.storage && <SpecRow label="Storage" value={product.storage} />}
+                    {product.processor && <SpecRow label="Processor" value={product.processor} />}
+                    {product.battery && <SpecRow label="Battery" value={`${product.battery} mAh`} />}
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Action Buttons */}
+            {/* Quantity */}
+            {!cartItem && (
+              <div className="flex items-center gap-4">
+                <span className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>Qty:</span>
+                <div className="flex items-center gap-1 rounded-lg overflow-hidden" style={{ border: "1px solid var(--border-subtle)", background: "var(--input-bg)" }}>
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="w-9 h-9 flex items-center justify-center text-lg transition-colors hover:opacity-70"
+                    style={{ color: "var(--text-primary)" }}
+                  >−</button>
+                  <span className="w-10 text-center text-sm font-bold" style={{ color: "var(--text-primary)" }}>{quantity}</span>
+                  <button
+                    onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                    className="w-9 h-9 flex items-center justify-center text-lg transition-colors hover:opacity-70"
+                    style={{ color: "var(--text-primary)" }}
+                  >+</button>
+                </div>
+              </div>
+            )}
 
+            {/* Actions */}
             {!cartItem ? (
-              <div className="flex gap-3 pt-2">
+              <div className="flex gap-3">
                 <button
                   onClick={handleAddToCart}
                   disabled={product.stock === 0}
-                  className={`flex-1 relative py-3.5 px-6 rounded-xl font-semibold text-sm tracking-wide transition-all duration-200 active:scale-[0.98]
-        ${
-          product.stock === 0
-            ? "bg-white/5 text-white/30 cursor-not-allowed"
-            : added
-              ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
-              : "bg-[#D4AF37] text-black hover:bg-[#B8941E] shadow-lg shadow-[#D4AF37]/20"
-        }`}
+                  className="flex-1 relative py-4 px-6 rounded-xl font-bold text-sm tracking-wide transition-all duration-200 active:scale-[0.98] disabled:opacity-40"
+                  style={{
+                    background: added ? "#10b981" : "var(--gold)",
+                    color: "#08080E",
+                  }}
                 >
-                  <span
-                    className={`transition-opacity duration-300 ${added ? "opacity-0" : "opacity-100"}`}
-                  >
+                  <span className={`transition-opacity duration-300 ${added ? "opacity-0" : "opacity-100"}`}>
                     {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
                   </span>
                   {added && (
-                    <span className="absolute inset-0 flex items-center justify-center font-bold">
-                      ✓ Added
-                    </span>
+                    <span className="absolute inset-0 flex items-center justify-center font-bold">✓ Added!</span>
                   )}
                 </button>
-
-                <button className="w-12 flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] hover:border-[#D4AF37] hover:bg-[#D4AF37]/10 text-white/60 hover:text-[#D4AF37] transition-all duration-200">
-                  <span className="text-xl leading-none">♡</span>
+                <button className="w-12 flex items-center justify-center rounded-xl transition-all duration-200" style={{ border: "1px solid var(--border-subtle)", background: "var(--input-bg)", color: "var(--text-muted)" }}>
+                  ♡
                 </button>
               </div>
             ) : (
-              <div className="w-32 flex items-center bg-white/[0.03] border border-white/10 rounded-xl p-1">
-                <button
-                  onClick={handleSubtractQuantity}
-                  className="flex-1 h-8 flex items-center justify-center text-[#D4AF37] hover:bg-white/5 rounded-lg transition-colors"
-                >
-                  -
-                </button>
-                <span className="flex-1 text-center text-white text-sm font-bold">
-                  {cartItem.quantity}
-                </span>
-                <button
-                  onClick={handleAddQuantity}
-                  className="flex-1 h-8 flex items-center justify-center text-[#D4AF37] hover:bg-white/5 rounded-lg transition-colors"
-                >
-                  +
-                </button>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>In cart:</span>
+                <div className="flex items-center rounded-xl overflow-hidden" style={{ border: "1px solid var(--border-subtle)", background: "var(--input-bg)" }}>
+                  <button onClick={handleSubtractQuantity} className="w-10 h-10 flex items-center justify-center transition-colors" style={{ color: "var(--gold)" }}>−</button>
+                  <span className="w-10 text-center font-bold text-sm" style={{ color: "var(--text-primary)" }}>{cartItem.quantity}</span>
+                  <button onClick={handleAddQuantity} className="w-10 h-10 flex items-center justify-center transition-colors" style={{ color: "var(--gold)" }}>+</button>
+                </div>
               </div>
             )}
 
-            {/* Delivery Info */}
-            <div className="bg-[rgba(245,240,232,0.02)] rounded-xl p-4 border border-[rgba(245,240,232,0.06)]">
-              <div className="flex items-center gap-3 text-sm">
-                <svg
-                  className="w-5 h-5 text-[#D4AF37]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                <span className="text-[rgba(245,240,232,0.72)]">
-                  Free delivery on orders above ₹999
-                </span>
-              </div>
-              <div className="flex items-center gap-3 text-sm mt-2">
-                <svg
-                  className="w-5 h-5 text-[#D4AF37]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                  />
-                </svg>
-                <span className="text-[rgba(245,240,232,0.72)]">
-                  Easy returns within 7 days
-                </span>
-              </div>
+            {/* Delivery info */}
+            <div className="rounded-xl p-4 space-y-2" style={{ background: "var(--input-bg)", border: "1px solid var(--border-subtle)" }}>
+              {[
+                { icon: "✓", text: "Free delivery on orders above ₹999" },
+                { icon: "↩", text: "Easy returns within 7 days" },
+                { icon: "🔒", text: "Secure checkout" },
+              ].map(({ icon, text }) => (
+                <div key={text} className="flex items-center gap-3 text-sm">
+                  <span style={{ color: "var(--gold)" }}>{icon}</span>
+                  <span style={{ color: "var(--text-secondary)" }}>{text}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

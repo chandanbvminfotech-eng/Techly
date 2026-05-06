@@ -6,103 +6,94 @@ const Cart = ({ cart }) => {
   const dispatch = useDispatch();
 
   const handleAddQuantity = async () => {
-    await dispatch(
-      updateCartQuantity({
-        productId: cart.productId.id,
-        quantity: cart.quantity + 1,
-      }),
-    );
+    await dispatch(updateCartQuantity({ productId: cart.productId.id, quantity: cart.quantity + 1 }));
   };
-
   const handleSubtractQuantity = async () => {
     if (cart.quantity === 1) {
       await dispatch(deleteSingleItemCart({ productId: cart.productId.id }));
     } else {
-      await dispatch(
-        updateCartQuantity({
-          productId: cart.productId.id,
-          quantity: cart.quantity - 1,
-        }),
-      );
+      await dispatch(updateCartQuantity({ productId: cart.productId.id, quantity: cart.quantity - 1 }));
     }
   };
-
   const handleDeleteItemCart = async () => {
     await dispatch(deleteSingleItemCart({ productId: cart.productId.id }));
   };
 
   return (
-    <div className="flex flex-col md:grid md:grid-cols-[5fr_1fr_1fr_1fr] gap-6 px-6 md:px-10 py-8 md:py-10 items-center transition-all duration-500 hover:bg-white/[0.02]">
-      {/* Product Information */}
-      <div className="flex items-center gap-5 md:gap-8 w-full">
-        <div className="group/img relative w-[80px] h-[80px] md:w-[100px] md:h-[100px] shrink-0 bg-white rounded-2xl border border-white/5 p-3 md:p-4 flex items-center justify-center">
+    <div
+      className="flex flex-col md:grid md:grid-cols-[5fr_1fr_1fr_1fr] gap-4 md:gap-6 px-5 md:px-8 py-5 md:py-6 items-center transition-all duration-300"
+      style={{ borderBottom: "1px solid var(--border-subtle)" }}
+      onMouseEnter={e => e.currentTarget.style.background = "var(--input-bg)"}
+      onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+    >
+      {/* Product info */}
+      <div className="flex items-center gap-4 w-full">
+        <div
+          className="relative w-[72px] h-[72px] md:w-[88px] md:h-[88px] shrink-0 rounded-xl p-2 flex items-center justify-center overflow-hidden"
+          style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)" }}
+        >
           <img
-            src={cart.productId?.images?.[0].url}
+            src={cart.productId?.images?.[0]?.url}
             alt={cart.productId.name}
-            className="w-full h-full object-contain transition-transform duration-700"
+            className="w-full h-full object-contain"
           />
         </div>
 
-        <div className="flex flex-col gap-1 w-full">
-          <h3 className="text-[#F5F0E8] text-base md:text-lg font-medium font-['DM_Sans'] tracking-tight">
+        <div className="flex flex-col gap-1 flex-1 min-w-0">
+          <h3 className="text-sm md:text-base font-semibold truncate" style={{ color: "var(--text-primary)" }}>
             {cart.productId.name}
           </h3>
-          <span className="text-[10px] md:text-[12px] text-[#D4AF37] uppercase tracking-[0.2em] font-bold line-clamp-1">
-            {cart.productId.description}
+          <span className="text-[10px] uppercase tracking-[0.15em] font-bold truncate" style={{ color: "var(--gold)" }}>
+            {cart.productId.brand || cart.productId.description?.slice(0, 40)}
           </span>
           <button
-            className="text-[9px] md:text-[10px] bg-white/[0.03] border border-white/5 hover:border-red-500/30 hover:bg-red-500/10 text-[rgba(245,240,232,0.5)] hover:text-red-400 px-3 py-1.5 rounded-full transition-all duration-300 uppercase tracking-[0.15em] font-medium mt-1 md:mt-2 w-fit"
             onClick={handleDeleteItemCart}
+            className="text-[10px] px-3 py-1 rounded-full w-fit mt-1 transition-all duration-200 uppercase tracking-wider font-medium"
+            style={{ background: "var(--input-bg)", color: "var(--text-muted)", border: "1px solid var(--border-subtle)" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(239,68,68,0.08)"; e.currentTarget.style.color = "#f87171"; e.currentTarget.style.borderColor = "rgba(239,68,68,0.3)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "var(--input-bg)"; e.currentTarget.style.color = "var(--text-muted)"; e.currentTarget.style.borderColor = "var(--border-subtle)"; }}
           >
-            Remove from vault
+            Remove
           </button>
         </div>
       </div>
 
-      {/* Mobile Stats Container (Price, Qty, Total in a row on mobile) */}
-      <div className="grid grid-cols-3 md:contents w-full items-center">
-        {/* Price Display */}
-        <div className="text-center md:text-center font-['DM_Sans']">
-          <span className="text-[rgba(245,240,232,0.4)] text-[9px] md:hidden block uppercase mb-1">
-            Unit Price
-          </span>
-          <span className="text-[#F5F0E8]/90 font-light text-sm md:text-base">
-            ₹{cart?.productId?.price?.toLocaleString()}
+      {/* Mobile: price/qty/total in a row; Desktop: in separate grid columns */}
+      <div className="grid grid-cols-3 md:contents w-full items-center gap-2">
+        {/* Price */}
+        <div className="text-center">
+          <span className="text-[9px] uppercase tracking-wider block mb-1 md:hidden" style={{ color: "var(--text-muted)" }}>Price</span>
+          <span className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
+            ₹{cart?.productId?.price?.toLocaleString("en-IN")}
           </span>
         </div>
 
-        {/* Modern Counter */}
-        <div className="flex flex-col items-center gap-1 md:gap-2">
-          <span className="text-[rgba(245,240,232,0.4)] text-[9px] md:hidden block uppercase mb-1">
-            Qty
-          </span>
-          <div className="flex items-center bg-white/[0.03] border border-white/10 rounded-full px-1.5 py-0.5">
+        {/* Qty stepper */}
+        <div className="flex flex-col items-center gap-1">
+          <span className="text-[9px] uppercase tracking-wider block md:hidden" style={{ color: "var(--text-muted)" }}>Qty</span>
+          <div className="flex items-center rounded-full px-1" style={{ background: "var(--input-bg)", border: "1px solid var(--border-subtle)" }}>
             <button
-              className="w-6 h-6 md:w-8 md:h-8 flex items-center justify-center text-[#D4AF37] hover:text-[#F5E090] transition-colors text-lg font-light"
+              className="w-7 h-7 flex items-center justify-center text-lg font-light transition-colors"
+              style={{ color: "var(--gold)" }}
               onClick={handleSubtractQuantity}
-            >
-              -
-            </button>
-            <span className="px-2 md:px-3 text-[#F5F0E8] text-xs md:text-sm font-bold min-w-[24px] text-center">
+            >−</button>
+            <span className="px-2 text-sm font-bold min-w-[24px] text-center" style={{ color: "var(--text-primary)" }}>
               {cart.quantity}
             </span>
             <button
-              className="w-6 h-6 md:w-8 md:h-8 flex items-center justify-center text-[#D4AF37] hover:text-[#F5E090] transition-colors text-lg font-light"
+              className="w-7 h-7 flex items-center justify-center text-lg font-light transition-colors"
+              style={{ color: "var(--gold)" }}
               onClick={handleAddQuantity}
-            >
-              +
-            </button>
+            >+</button>
           </div>
         </div>
 
-        {/* Total Display */}
+        {/* Line total */}
         <div className="text-right">
-          <span className="text-[rgba(245,240,232,0.4)] text-[9px] md:hidden block uppercase mb-1">
-            Total
+          <span className="text-[9px] uppercase tracking-wider block mb-1 md:hidden" style={{ color: "var(--text-muted)" }}>Total</span>
+          <span className="text-base font-bold font-[Georgia,serif]" style={{ color: "var(--gold)" }}>
+            ₹{(cart.quantity * cart.productId.price).toLocaleString("en-IN")}
           </span>
-          <div className="font-[Georgia,serif] text-[#F5E090] text-lg md:text-xl tracking-tight italic">
-            ₹{(cart.quantity * cart.productId.price).toLocaleString()}
-          </div>
         </div>
       </div>
     </div>

@@ -4,6 +4,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { logoutUser } from "../features/auth/authSlice";
 import UserAvatar from "../components/UserAvatar";
 import { clearCart } from "../features/cart/cartSlice";
+import { useTheme } from "../context/ThemeContext";
+
+
 
 const NavBar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -40,24 +43,20 @@ const NavBar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-400 ${
-        scrolled
-          ? "bg-[rgba(8,8,14,0.88)] backdrop-blur-2xl border-b border-[rgba(212,175,55,0.12)]"
-          : "bg-transparent border-b border-transparent"
-      }`}
+      style={{
+        background: scrolled ? "var(--nav-bg)" : "transparent",
+        backdropFilter: scrolled ? "blur(24px)" : "none",
+        borderBottomColor: scrolled ? "var(--border-subtle)" : "transparent",
+      }}
+      className="fixed top-0 left-0 right-0 z-[100] transition-all duration-400 border-b"
     >
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-8 h-[72px] flex items-center justify-between gap-3">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-8 h-[68px] flex items-center justify-between gap-3">
         {/* Logo */}
-        <Link
-          to="/"
-          className="flex items-center gap-[10px] no-underline flex-shrink-0"
-        >
+        <Link to="/" className="flex items-center gap-[10px] no-underline flex-shrink-0">
           <div className="w-[34px] h-[34px] rounded-[9px] bg-gradient-to-br from-[#D4AF37] to-[#F5E090] flex items-center justify-center">
-            <span className="text-[17px] font-black text-[#08080E] font-[Georgia,serif]">
-              T
-            </span>
+            <span className="text-[17px] font-black text-[#08080E] font-[Georgia,serif]">T</span>
           </div>
-          <span className="text-[22px] text-[#F5F0E8] tracking-[-0.2px] font-[Georgia,'Times New Roman',serif] hidden sm:inline">
+          <span className="text-[22px] tracking-[-0.2px] font-[Georgia,'Times New Roman',serif] hidden sm:inline" style={{ color: "var(--text-primary)" }}>
             Techly
           </span>
         </Link>
@@ -68,7 +67,10 @@ const NavBar = () => {
             <Link
               key={l}
               to={to}
-              className="px-4 py-2 rounded-lg text-sm font-medium text-[rgba(245,240,232,0.72)] font-['DM_Sans',system-ui,sans-serif] transition-all duration-200 hover:text-[#F5F0E8] hover:bg-[rgba(255,255,255,0.06)]"
+              className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+              style={{ color: "var(--text-secondary)" }}
+              onMouseEnter={e => { e.currentTarget.style.color = "var(--text-primary)"; e.currentTarget.style.background = "var(--bg-chip)"; }}
+              onMouseLeave={e => { e.currentTarget.style.color = "var(--text-secondary)"; e.currentTarget.style.background = "transparent"; }}
             >
               {l}
             </Link>
@@ -77,26 +79,28 @@ const NavBar = () => {
 
         {/* Right side */}
         <div className="flex gap-[10px] items-center">
+          {/* Theme Toggle */}
+  
+
           {user ? (
             <>
               <Link
                 to="/cart"
-                className="no-underline px-[16px] sm:px-[20px] py-[9px] rounded-[10px] border border-[rgba(245,240,232,0.15)] text-[rgba(245,240,232,0.85)] text-sm font-medium hover:text-[#D4AF37] transition-colors"
+                className="no-underline px-[14px] sm:px-[18px] py-[8px] rounded-[10px] text-sm font-medium transition-colors"
+                style={{ border: "1px solid var(--border-subtle)", color: "var(--text-secondary)" }}
               >
-                Cart
+                🛒 Cart
               </Link>
               <Link to="/profile" className="flex items-center gap-2">
-                <UserAvatar
-                  name={user.name}
-                  avatarLink={user.avatar?.[0]?.url}
-                />
-                <span className="text-[#F5F0E8] text-sm font-medium hidden sm:inline">
+                <UserAvatar name={user.name} avatarLink={user.avatar?.[0]?.url} />
+                <span className="text-sm font-medium hidden sm:inline" style={{ color: "var(--text-primary)" }}>
                   {user.name}
                 </span>
               </Link>
               <button
                 onClick={handleLogout}
-                className="hidden md:block px-[22px] py-[9px] rounded-[10px] border border-[rgba(212,175,55,0.4)] text-[#D4AF37] text-sm font-medium hover:bg-[rgba(212,175,55,0.1)] transition-colors"
+                className="hidden md:block px-[18px] py-[8px] rounded-[10px] text-sm font-medium transition-colors"
+                style={{ border: "1px solid var(--gold-muted)", color: "var(--gold)" }}
               >
                 Sign Out
               </button>
@@ -105,58 +109,47 @@ const NavBar = () => {
             <>
               <Link
                 to="/signin"
-                className="hidden sm:block no-underline px-[20px] py-[9px] rounded-[10px] border border-[rgba(245,240,232,0.15)] text-[rgba(245,240,232,0.85)] text-sm font-medium"
+                className="hidden sm:block no-underline px-[18px] py-[8px] rounded-[10px] text-sm font-medium transition-colors"
+                style={{ border: "1px solid var(--border-subtle)", color: "var(--text-secondary)" }}
               >
                 Sign In
               </Link>
               <Link
                 to="/signup"
-                className="hidden sm:block no-underline px-[22px] py-[9px] rounded-[10px] bg-gradient-to-br from-[#D4AF37] to-[#B8941E] text-[#08080E] text-sm font-semibold shadow-[0_0_20px_rgba(212,175,55,0.3)]"
+                className="hidden sm:block no-underline px-[20px] py-[8px] rounded-[10px] bg-gradient-to-br from-[#D4AF37] to-[#B8941E] text-[#08080E] text-sm font-semibold shadow-[0_0_20px_rgba(212,175,55,0.3)]"
               >
                 Get Started
               </Link>
             </>
           )}
 
-          {/* Mobile Menu Button - Hamburger */}
+          {/* Mobile Hamburger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden bg-none border-none cursor-pointer text-[#F5F0E8] p-[6px] z-[110]"
+            className="md:hidden bg-none border-none cursor-pointer p-[6px] z-[110]"
+            style={{ color: "var(--text-primary)" }}
           >
             <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
               {menuOpen ? (
-                <path
-                  d="M4 4L18 18M18 4L4 18"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
+                <path d="M4 4L18 18M18 4L4 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               ) : (
-                <path
-                  d="M3 6H19M3 11H19M3 16H19"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
+                <path d="M3 6H19M3 11H19M3 16H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               )}
             </svg>
           </button>
         </div>
       </div>
 
-      {/* --- MOBILE DRAWER SECTION --- */}
-
-      {/* Overlay: Darkens background when drawer is open */}
+      {/* Mobile overlay */}
       <div
-        className={`fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${menuOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}
+        className={`fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 md:hidden ${menuOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}
         onClick={() => setMenuOpen(false)}
       />
 
-      {/* Drawer Panel */}
+      {/* Mobile Drawer */}
       <div
-        className={`fixed top-0 left-0 h-screen w-[280px] bg-[#08080E] border-r border-[rgba(212,175,55,0.12)] shadow-2xl z-[105] transform transition-transform duration-300 ease-in-out md:hidden ${
-          menuOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed top-0 left-0 h-screen w-[280px] border-r shadow-2xl z-[105] transform transition-transform duration-300 ease-in-out md:hidden ${menuOpen ? "translate-x-0" : "-translate-x-full"}`}
+        style={{ background: "var(--drawer-bg)", borderColor: "var(--border-subtle)" }}
       >
         <div className="flex flex-col h-full pt-20 px-6 pb-10">
           <div className="flex flex-col gap-2">
@@ -164,50 +157,45 @@ const NavBar = () => {
               <Link
                 key={l}
                 to={to}
-                className="no-underline px-4 py-3 text-[#F5F0E8] text-lg rounded-xl font-medium hover:bg-white/5 transition-colors"
+                className="no-underline px-4 py-3 text-lg rounded-xl font-medium transition-colors"
+                style={{ color: "var(--text-primary)" }}
               >
                 {l}
               </Link>
             ))}
 
-            <div className="h-[1px] bg-white/5 my-4" />
+            <div className="h-[1px] my-4" style={{ background: "var(--border-subtle)" }} />
+
+
+            <div className="h-[1px] my-2" style={{ background: "var(--border-subtle)" }} />
 
             {user ? (
               <>
-                <Link
-                  to="/cart"
-                  className="no-underline px-4 py-3 text-[#F5F0E8] text-lg rounded-xl hover:bg-white/5 transition-colors"
-                >
-                  Cart
+                <Link to="/cart" className="no-underline px-4 py-3 text-lg rounded-xl transition-colors" style={{ color: "var(--text-primary)" }}>
+                  🛒 Cart
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="px-4 py-3 text-left text-[#D4AF37] text-lg rounded-xl font-medium hover:bg-[#D4AF37]/10 transition-colors"
+                  className="px-4 py-3 text-left text-lg rounded-xl font-medium transition-colors"
+                  style={{ color: "var(--gold)" }}
                 >
                   Sign Out
                 </button>
               </>
             ) : (
               <>
-                <Link
-                  to="/signin"
-                  className="no-underline px-4 py-3 text-[#F5F0E8] text-lg rounded-xl hover:bg-white/5 transition-colors"
-                >
+                <Link to="/signin" className="no-underline px-4 py-3 text-lg rounded-xl transition-colors" style={{ color: "var(--text-primary)" }}>
                   Sign In
                 </Link>
-                <Link
-                  to="/signup"
-                  className="no-underline px-4 py-3 text-[#D4AF37] text-lg rounded-xl font-semibold"
-                >
+                <Link to="/signup" className="no-underline px-4 py-3 text-lg rounded-xl font-semibold" style={{ color: "var(--gold)" }}>
                   Get Started
                 </Link>
               </>
             )}
           </div>
 
-          {/* Decorative Bottom element */}
-          <div className="mt-auto opacity-20 italic font-[Georgia] text-[#D4AF37] text-sm">
-            Techly Luxury Curation
+          <div className="mt-auto opacity-30 italic font-[Georgia] text-sm" style={{ color: "var(--gold)" }}>
+            Techly
           </div>
         </div>
       </div>

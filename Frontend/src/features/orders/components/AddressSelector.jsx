@@ -6,19 +6,12 @@ const AddressSelector = ({ addresses, selectedAddressId, onSelectAddress }) => {
 
   if (addresses.length === 0) {
     return (
-      <div className="bg-[rgba(255,255,255,0.04)] rounded-xl p-5 mb-6">
-        <h2 className="text-lg font-semibold text-white mb-4">
-          Shipping Address
-        </h2>
-        <div className="text-center py-4">
-          <p className="text-[rgba(245,240,232,0.6)] mb-3">
-            No addresses saved
-          </p>
-          <button
-            onClick={() => navigate("/profile?tab=addresses")}
-            className="text-[#D4AF37] text-sm underline"
-          >
-            Add an address first
+      <div>
+        <h2 className="text-base font-bold mb-4" style={{ color: "var(--text-primary)" }}>Shipping Address</h2>
+        <div className="text-center py-6 rounded-xl" style={{ background: "var(--input-bg)", border: "1px solid var(--border-subtle)" }}>
+          <p className="text-sm mb-3" style={{ color: "var(--text-secondary)" }}>No addresses saved yet</p>
+          <button onClick={() => navigate("/profile?tab=addresses")} className="text-sm font-semibold underline" style={{ color: "var(--gold)" }}>
+            Add an address →
           </button>
         </div>
       </div>
@@ -26,19 +19,17 @@ const AddressSelector = ({ addresses, selectedAddressId, onSelectAddress }) => {
   }
 
   return (
-    <div className="bg-[rgba(255,255,255,0.04)] rounded-xl p-5 mb-6">
-      <h2 className="text-lg font-semibold text-white mb-4">
-        Shipping Address
-      </h2>
+    <div>
+      <h2 className="text-base font-bold mb-4" style={{ color: "var(--text-primary)" }}>Shipping Address</h2>
       <div className="space-y-3">
         {addresses.map((addr) => (
           <label
             key={addr._id}
-            className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all ${
-              selectedAddressId === addr._id
-                ? "bg-[rgba(212,175,55,0.1)] border border-[#D4AF37]"
-                : "bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.1)]"
-            }`}
+            className="flex items-start gap-3 p-4 rounded-xl cursor-pointer transition-all"
+            style={{
+              background: selectedAddressId === addr._id ? "var(--gold-muted)" : "var(--input-bg)",
+              border: `1px solid ${selectedAddressId === addr._id ? "var(--gold)" : "var(--border-subtle)"}`,
+            }}
           >
             <input
               type="radio"
@@ -46,20 +37,16 @@ const AddressSelector = ({ addresses, selectedAddressId, onSelectAddress }) => {
               value={addr._id}
               checked={selectedAddressId === addr._id}
               onChange={() => onSelectAddress(addr._id)}
-              className="mt-1"
+              className="mt-0.5 accent-[#D4AF37]"
             />
             <div className="flex-1">
-              <p className="text-white text-sm font-medium">
-                {addr.name}{" "}
-                {addr.isDefault && (
-                  <span className="text-[#D4AF37] text-xs ml-2">(Default)</span>
-                )}
+              <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                {addr.name}
+                {addr.isDefault && <span className="ml-2 text-[11px] font-bold" style={{ color: "var(--gold)" }}>(Default)</span>}
               </p>
-              <p className="text-[rgba(245,240,232,0.6)] text-xs">
-                {addr.phone}
-              </p>
-              <p className="text-[rgba(245,240,232,0.5)] text-xs mt-1">
-                {addr.addressLine}, {addr.city}, {addr.state} - {addr.pincode}
+              <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>{addr.phone}</p>
+              <p className="text-xs mt-1" style={{ color: "var(--text-secondary)" }}>
+                {addr.addressLine}, {addr.city}, {addr.state} – {addr.pincode}
               </p>
             </div>
           </label>
