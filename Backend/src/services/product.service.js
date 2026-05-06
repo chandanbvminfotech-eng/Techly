@@ -26,7 +26,6 @@ const createProduct = async ({ body, files, userId }) => {
   const uploadmultiple = filesToUpload.map((file) =>
     uploadOnCloudinary(file.path, folderName),
   );
-  console.log("All images uploaded");
   const results = await Promise.all(uploadmultiple);
   const imagesCollection = results
     .filter((r) => r !== null)
@@ -205,7 +204,7 @@ const deleteProduct = async ({ productId, userId, role }) => {
   if (!mongoose.Types.ObjectId.isValid(productId)) {
     throw new ApiError(400, "Invalid product ID");
   }
-  console.log("ProductId in Backend service:", productId, userId, role);
+
   const product = await Product.findById(productId);
 
   if (!product) {

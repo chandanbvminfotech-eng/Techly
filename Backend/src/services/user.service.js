@@ -49,13 +49,11 @@ const updateUserProfile = async ({ userId, name, email, avatar }) => {
   }
   if (email) {
     updatedData.email = email;
-    console.log(updatedData)
   }
   const avatarLocalPath = avatar?.path;
   if (avatarLocalPath) {
     const folderName = "avatars";
     const avatarImage = await uploadOnCloudinary(avatarLocalPath, folderName);
-    console.log(avatarImage.public_id);
     updatedData.avatar = [
       { url: avatarImage.url, public_id: avatarImage.public_id },
     ];

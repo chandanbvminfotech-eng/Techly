@@ -98,13 +98,13 @@ const getAllOrders = async () => {
 
 const getAdminStats = async () => {
   const totalUsers = await User.countDocuments({ role: "buyer" });
-  console.log("Total Users:", totalUsers);
+
 
   const totalOrders = await Order.countDocuments();
-  console.log("Total Orders:", totalOrders);
+
 
   const totalSellers = await User.countDocuments({ role: "seller" });
-  console.log("Total Sellers:", totalSellers);
+
 
   const totalRevenue = await Order.aggregate([
     {
@@ -114,7 +114,7 @@ const getAdminStats = async () => {
       },
     },
   ]);
-  console.log("Total Revenue:", totalRevenue[0]?.totalRevenue || 0);
+
 
   const pendingSellerApprovals = await User.countDocuments({
     role: "seller",

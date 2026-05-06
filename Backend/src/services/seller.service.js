@@ -75,10 +75,10 @@ const getSellerStats = async ({ sellerId }) => {
     throw new ApiError(400, "Seller ID is required");
   }
   const totalProducts = await Product.countDocuments({ sellerId });
-  // console.log("Total Products:", totalProducts);
+
 
   const totalOrders = await OrderItem.countDocuments({ sellerId });
-  // console.log("Total Orders:", totalOrders);
+
 
   const revenue = await OrderItem.aggregate([
     { $match: { sellerId: new mongoose.Types.ObjectId(sellerId) } },
@@ -90,7 +90,7 @@ const getSellerStats = async ({ sellerId }) => {
     },
   ]);
   const totalRevenue = revenue[0]?.total || 0;
-  // console.log("Total Revenue:", totalRevenue);
+
 
   return { totalProducts, totalOrders, totalRevenue };
 };

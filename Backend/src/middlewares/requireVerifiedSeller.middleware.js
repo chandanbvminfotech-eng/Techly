@@ -5,7 +5,6 @@ const requireVerifiedSeller = (req, res, next) => {
     if (!req.user.isVerified) {
       throw new ApiError(401, "Your seller account is not yet approved");
     }
-    console.log(req.user);
     next();
   } catch (error) {
     next(error);

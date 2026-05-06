@@ -5,11 +5,6 @@ import { applyForSellerController, getUserData, updateUserProfileController } fr
 import upload from "../middlewares/multer.middleware.js";
 const userRouter = Router();
 
-userRouter.get("/", async (req, res) => {
-    console.log("Get all users");
-    res.json("Get all users" );
-} )
-// userRouter.post("/",signUp)
 
 userRouter.get("/profile", verifyJWT,getUserData);
 userRouter.put("/profile", verifyJWT, upload.single("avatar"), updateUserProfileController);
